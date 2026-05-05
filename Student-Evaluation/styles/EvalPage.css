@@ -1,0 +1,171 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #eef2f5;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    overflow-y: auto;
+    height: 100vh;
+}
+
+.page-wrapper {
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+}
+
+/* Progress bar styling - Green/Red/White */
+.tab-step {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+}
+
+.tab-step .step-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin: 0 auto;
+    transition: all 0.2s;
+}
+
+.tab-step.green .step-circle {
+    background-color: #2e7d64;
+    color: white;
+    box-shadow: 0 2px 8px rgba(46,125,100,0.3);
+}
+
+.tab-step.red .step-circle {
+    background-color: #e05a5a;
+    color: white;
+    box-shadow: 0 2px 8px rgba(224,90,90,0.3);
+}
+
+.tab-step.white .step-circle {
+    background-color: white;
+    color: #4f46e5;
+    border: 3px solid #4f46e5;
+    font-weight: 800;
+    transform: scale(1.05);
+}
+
+.tab-step .step-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.tab-step.green .step-label { color: #2e7d64; }
+.tab-step.red .step-label { color: #e05a5a; }
+.tab-step.white .step-label { color: #4f46e5; font-weight: 700; }
+
+.progress-connector {
+    flex: 0.5;
+    height: 4px;
+    margin: 0 6px;
+    position: relative;
+    top: -12px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.progress-connector.green { background-color: #2e7d64; }
+.progress-connector.red { background-color: #e05a5a; }
+.progress-connector.white { background-color: #4f46e5; }
+
+/* Rating options */
+.rating-option {
+    transition: all 0.15s ease;
+}
+.rating-option.selected {
+    background-color: #4f46e5 !important;
+    color: white !important;
+    border-color: #4f46e5 !important;
+}
+
+.page-transition {
+    animation: fadeSlide 0.3s ease-out;
+}
+
+@keyframes fadeSlide {
+    from { opacity: 0; transform: translateX(15px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.custom-scroll::-webkit-scrollbar { width: 8px; }
+.custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+.custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+.prof-scroll-list {
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.prof-scroll-list::-webkit-scrollbar { width: 5px; }
+.prof-scroll-list::-webkit-scrollbar-track { background: #eef2f8; border-radius: 10px; }
+.prof-scroll-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+.prof-avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.currently-evaluating-card { text-align: center; }
+
+.prof-avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.extended-padding { padding: 32px 36px; }
+.page-content { min-height: 400px; }
+
+.bottom-progress-container {
+    padding: 20px 28px;
+    border-top: 1px solid #eef2f8;
+    background: white;
+}
+
+.warning-badge {
+    background: #fef3c7;
+    color: #d97706;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.bg-green-100 {
+    background-color: #d1fae5 !important;
+}
+
+.text-green-700 {
+    color: #047857 !important;
+}

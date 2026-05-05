@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>QCU Student Evaluation</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="../styles/EvalPage.css">
+</head>
+<body class="bg-gray-300 font-sans h-screen flex flex-col overflow-hidden">
+
+<div class="bg-[#4f46e5] text-white flex justify-between items-center px-8 py-4 shadow-lg shrink-0">
+    <h1 class="text-xl font-bold uppercase">Quezon City University</h1>
+    <button id="logoutBtn" class="bg-red-500 px-5 py-2 rounded-xl shadow hover:bg-red-600">
+        Log Out
+    </button>
+</div>
+
+<div class="page-wrapper flex-1 overflow-hidden p-4 md:p-6">
+    <div class="grid grid-cols-1 md:grid-cols-[340px_1fr] gap-6 h-full">
+        
+        <div class="flex flex-col gap-5 h-full overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-lg p-5 shrink-0">
+                <p class="text-sm text-gray-500 font-semibold mb-1">Student Number:</p>
+                <p id="studentDisplay" class="text-2xl font-bold text-gray-800 mb-3">24 - XXXX</p>
+                <p class="text-gray-700 text-sm mb-1"><span class="font-medium">Class Code:</span> 24 - XXXX</p>
+                <p class="text-gray-700 text-sm mb-1"><span class="font-medium">Number of Professor:</span> 5</p>
+                <p class="text-green-600 font-semibold text-sm mt-2">Status: Regular</p>
+            </div>
+
+           <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-indigo-500 shrink-0 flex flex-col items-center text-center">
+    <div id="currentProfAvatar" class="prof-avatar-large shadow-lg mb-4">NB</div>
+            
+    <div>
+        <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Currently Evaluating</p>
+        <p class="font-bold text-2xl text-gray-800" id="currentProfNameDisplay">Nicky Balew</p>
+        </div>
+    
+             <p class="text-sm text-gray-600 mt-3" id="currentCourseDisplay">Course Code: IM101</p>
+            <p class="text-xs text-indigo-600 mt-1 break-all" id="currentEmailDisplay">nickybalew@gmail.com</p>
+    </div>
+            
+            <div class="bg-white rounded-2xl shadow-lg p-4 flex-1 flex flex-col overflow-hidden min-h-0">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">List of Professors</p>
+                <div class="prof-scroll-list flex-1 overflow-y-auto custom-scroll" id="professorsListContainer"></div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden h-full">
+            <div class="bg-[#4f46e5] text-white px-8 py-5 shrink-0 flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Student Evaluation</h2>
+                <div id="dateTimeDisplayHeader" class="text-sm bg-indigo-700 px-4 py-1.5 rounded-full font-medium">04/17/2026 10:00 AM</div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scroll bg-gray-50" id="mainContentArea">
+                <div id="page0" class="page-content p-8 page-transition">
+                    <div id="questionsPage0" class="space-y-6"></div>
+                </div>
+                <div id="page1" class="page-content p-8 page-transition hidden">
+                    <div id="questionsPage1" class="space-y-6"></div>
+                </div>
+                <div id="page2" class="page-content p-8 page-transition hidden">
+                    <div id="questionsPage2" class="space-y-6"></div>
+                </div>
+                <div id="page3" class="page-content p-8 page-transition hidden">
+                    <div id="questionsPage3" class="space-y-6"></div>
+                    <div id="submitMessage" class="mt-4 hidden text-center text-green-600 font-bold p-4 bg-green-50 rounded-xl"></div>
+                </div>
+            </div>
+
+            <div class="bg-white border-t border-gray-200 p-6 shrink-0">
+                <div class="flex justify-between items-center max-w-5xl mx-auto">
+                    <div>
+                        <span class="warning-badge" id="page0Warning"></span>
+                        <span class="warning-badge hidden" id="page1Warning"></span>
+                        <span class="warning-badge hidden" id="page2Warning"></span>
+                        <span class="warning-badge hidden" id="page3Warning"></span>
+                    </div>
+                    <div class="flex gap-4 items-center">
+                        <span id="submitEnableBadge" class="text-xs font-semibold"></span>
+                        <button id="prevBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-8 py-2 rounded-xl font-semibold transition disabled:opacity-50">Back</button>
+                        <button id="nextBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 rounded-xl font-semibold transition" onclick="isPageComplete">Next</button>
+                        <button id="submitEvalBtn" class="hidden bg-green-600 hover:bg-green-700 text-white px-10 py-2 rounded-xl font-bold transition disabled:opacity-50" disabled>Submit</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-progress-container shrink-0 bg-gray-50 border-t border-gray-100">
+                <div class="flex items-center justify-between px-10 py-4">
+                    <div class="tab-step" id="tabPage0"><div class="step-circle">1</div><div class="step-label">Teaching</div></div>
+                    <div class="progress-connector" id="connector0"></div>
+                    <div class="tab-step" id="tabPage1"><div class="step-circle">2</div><div class="step-label">Professionalism</div></div>
+                    <div class="progress-connector" id="connector1"></div>
+                    <div class="tab-step" id="tabPage2"><div class="step-circle">3</div><div class="step-label">Attitude</div></div>
+                    <div class="progress-connector" id="connector2"></div>
+                    <div class="tab-step" id="tabPage3"><div class="step-circle">4</div><div class="step-label">Appearance</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../scripts/EP.js"></script>
+</body>
+</html>

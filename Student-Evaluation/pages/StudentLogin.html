@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCU - Student Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-300 flex items-center justify-center min-h-screen font-sans">
+
+    <div class="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md text-center mx-4 transition-all">
+        
+        <h1 class="text-4xl font-bold text-[#4f46e5] mb-6 tracking-tight uppercase">
+            WELCOME
+        </h1>
+
+        <div class="flex justify-center mb-6">
+            <div class="w-48 h-48 rounded-full bg-[#fdf2e9] overflow-hidden flex items-center justify-center">
+                <img src="../images/avatar.png" alt="Avatar" class="w-full h-full object-cover" />
+            </div>
+        </div>
+
+        <h2 class="text-3xl font-bold text-[#4f46e5] mb-6">
+            Hello, Student!
+        </h2>
+
+        <div class="mb-6">
+            <input 
+                type="text" 
+                id="studentNumber" 
+                placeholder="Student Number" 
+                class="w-full bg-gray-200 border-2 border-gray-400 rounded-xl py-3 px-4 text-center text-gray-700 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-all"
+            >
+        </div>
+
+        <button id="submitLogin" class="w-1/2 bg-[#4f46e5] hover:bg-[#3f38c2] text-white text-xl font-bold py-3 rounded-2xl shadow-lg transform active:scale-95 transition-all">
+            Log in
+        </button>
+
+        <p id="errorMessage" class="text-red-500 text-sm mt-4 hidden">Please enter a valid student number.</p>
+        
+        <button onclick="window.location.href='Login.html'" 
+            class="block mx-auto mt-4 text-sm text-gray-400 hover:text-indigo-600 transition-colors">
+            ← Go Back
+        </button>
+    
+    </div>
+
+    <script src="../scripts/SL.js"></script>
+</body>
+</html>
