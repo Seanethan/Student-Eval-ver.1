@@ -64,7 +64,14 @@
                 </div>
                 <div id="page3" class="page-content p-8 page-transition hidden">
                     <div id="questionsPage3" class="space-y-6"></div>
-                    <div id="submitMessage" class="mt-4 hidden text-center text-green-600 font-bold p-4 bg-green-50 rounded-xl"></div>
+                    <div id="submitMessage" class="mt-2 hidden text-center text-green-600 font-bold p-4 bg-green-50 rounded-xl"></div>
+                </div>
+                <div id="page4" class="page-content p-8 page-transition hidden">
+                    <div class="bg-white rounded-xl p-3 border border-gray-200 shadow-sm">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Additional Remarks</h3>
+                        <p class="text-gray-600 mb-4">Please provide any additional personal feedback or comments regarding the professor's performance.</p>
+                        <textarea id="remarksInput" class="w-full h-40 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none" placeholder="Enter your remarks here..."></textarea>
+                    </div>
                 </div>
             </div>
 
@@ -75,6 +82,7 @@
                         <span class="warning-badge hidden" id="page1Warning"></span>
                         <span class="warning-badge hidden" id="page2Warning"></span>
                         <span class="warning-badge hidden" id="page3Warning"></span>
+                        <span class="warning-badge hidden" id="page4Warning"></span>
                     </div>
                     <div class="flex gap-4 items-center">
                         <span id="submitEnableBadge" class="text-xs font-semibold"></span>
@@ -94,6 +102,8 @@
                     <div class="tab-step" id="tabPage2"><div class="step-circle">3</div><div class="step-label">Attitude</div></div>
                     <div class="progress-connector" id="connector2"></div>
                     <div class="tab-step" id="tabPage3"><div class="step-circle">4</div><div class="step-label">Appearance</div></div>
+                    <div class="progress-connector" id="connector3"></div>
+                    <div class="tab-step" id="tabPage4"><div class="step-circle">5</div><div class="step-label">Remarks</div></div>
                 </div>
             </div>
         </div>

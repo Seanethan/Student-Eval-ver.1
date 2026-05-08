@@ -147,60 +147,75 @@ function isAllQuestionsComplete() {
     return answers.every(a => a !== null);
 }
 
+function isRemarksComplete() {
+    const remarks = document.getElementById('remarksInput');
+    return remarks && remarks.value.trim().length > 0;
+}
+
 function updateSubmitButtonState() {
     const submitBtn = document.getElementById('submitEvalBtn');
-    const allComplete = isAllQuestionsComplete();
+    const questionsDone = isAllQuestionsComplete();
+    const remarksDone = isRemarksComplete();
+
     if (submitBtn) {
-        if (allComplete) {
+        if (questionsDone && remarksDone) {
             submitBtn.disabled = false;
-            submitBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
-            document.getElementById('submitEnableBadge').innerHTML = '<span class="text-green-600 text-xs font-semibold">All questions answered! Ready to submit.</span>';
-            document.getElementById('page3Warning')?.classList.add('hidden');
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('submitEnableBadge').innerHTML = '<span class="text-green-600 text-xs font-semibold">Ready to submit!</span>';
         } else {
             submitBtn.disabled = true;
-            const answeredCount = getCurrentAnswers().filter(a => a !== null).length;
-            document.getElementById('submitEnableBadge').innerHTML = `<span class="text-orange-500 text-xs">${answeredCount}/${questions.length} answered.</span>`;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            if (!questionsDone) {
+                const answeredCount = getCurrentAnswers().filter(a => a !== null).length;
+                document.getElementById('submitEnableBadge').innerHTML = `<span class="text-orange-500 text-xs">${answeredCount}/${questions.length} answered.</span>`;
+            } else {
+                document.getElementById('submitEnableBadge').innerHTML = '<span class="text-orange-500 text-xs font-semibold">Please add your remarks.</span>';
+            }
         }
     }
 }
 
 function updatePageWarnings() {
-    for (let i = 0; i <= 3; i++) {
+    for (let i = 0; i <= 4; i++) {
         const warningEl = document.getElementById(`page${i}Warning`);
         if (warningEl) {
             warningEl.classList.toggle('hidden', i !== currentPage);
-            if (isPageComplete(i)) {
+            
+            const isComplete = (i === 4) ? isRemarksComplete() : isPageComplete(i);
+
+            if (isComplete) {
                 warningEl.classList.remove('warning-badge');
                 warningEl.classList.add('bg-green-100', 'text-green-700', 'px-3', 'py-1', 'rounded-full');
                 warningEl.textContent = "Section Complete";
             } else {
                 warningEl.classList.add('warning-badge');
                 warningEl.classList.remove('bg-green-100', 'text-green-700', 'px-3', 'py-1', 'rounded-full');
-                warningEl.textContent = "Please answer all 5 questions";
+                warningEl.textContent = (i === 4) ? "Please write your remarks" : "Please answer all 5 questions";
             }
         }
     }
 }
 
 function updateProgressBarColors() {
-    for (let i = 0; i <= 3; i++) {
+    for (let i = 0; i <= 4; i++) {
         const tab = document.getElementById(`tabPage${i}`);
-        const connector = document.getElementById(`connector${i}`);
+        const connector = document.getElementById(`connector${i-1}`);
         if (tab) {
             tab.classList.remove('green', 'red', 'white');
             if (i === currentPage) {
                 tab.classList.add('white');
-            } else if (isPageComplete(i)) {
-                tab.classList.add('green');
             } else {
-                tab.classList.add('red');
+                const isComplete = (i === 4) ? isRemarksComplete() : isPageComplete(i);
+                tab.classList.add(isComplete ? 'green' : 'red');
             }
         }
         if (connector && i > 0) {
             connector.classList.remove('green', 'red', 'white');
             let allPrevComplete = true;
             for (let j = 0; j < i; j++) {
-                if (!isPageComplete(j)) allPrevComplete = false;
+                const prevStepDone = (j === 4) ? isRemarksComplete() : isPageComplete(j);
+                if (!prevStepDone) allPrevComplete = false;
             }
             if (allPrevComplete && currentPage >= i) {
                 connector.classList.add('green');
@@ -281,7 +296,7 @@ function ratingClickHandler() {
 }
 
 function goToPage(pageNum) {
-    if (pageNum < 0 || pageNum > 3) return;
+    if (pageNum < 0 || pageNum > 4) return;
     
     document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
     document.getElementById(`page${pageNum}`).classList.remove('hidden');
@@ -292,7 +307,7 @@ function goToPage(pageNum) {
     const submitBtn = document.getElementById('submitEvalBtn');
     const prevBtn = document.getElementById('prevBtn');
 
-    if (pageNum === 3) {
+    if (pageNum === 4) {
         nextBtn.classList.add('hidden');
         submitBtn.classList.remove('hidden');
     } else {
@@ -308,7 +323,7 @@ function goToPage(pageNum) {
 }
 
 async function submitAndContinue() {
-    if (!isAllQuestionsComplete()) {
+    if (!isAllQuestionsComplete() || !isRemarksComplete()) {
         showToast("Cannot submit! Please answer all questions first.");
         return;
     }
@@ -347,6 +362,12 @@ async function submitAndContinue() {
             currentProfessorIndex = nextIndex;
             currentProfessor = professors[currentProfessorIndex];
             currentPage = 0;
+
+            const remarksBox = document.getElementById('remarksInput');
+            if (remarksBox) {
+            remarksBox.value = "";
+            }
+        
             
             document.getElementById('currentProfNameDisplay').innerText = currentProfessor.name;
             document.getElementById('currentCourseDisplay').innerText = `Course Code: ${currentProfessor.course}`;
@@ -360,6 +381,7 @@ async function submitAndContinue() {
             goToPage(0);
             renderCurrentPageQuestions();
             updateProgressBarColors();
+            updatePageWarnings();
             updateSubmitButtonState();
             renderProfessorsList();
             
@@ -404,6 +426,11 @@ function switchProfessor(prof, index) {
     document.getElementById('currentEmailDisplay').innerText = prof.email || '';
     updateProfessorAvatar(prof);
     
+    const remarksBox = document.getElementById('remarksInput');
+    if (remarksBox) {
+        remarksBox.value = "";
+    }
+
     if (!evaluationsStore[currentProfessor.name]) {
         evaluationsStore[currentProfessor.name] = { answers: new Array(questions.length).fill(null) };
     }
@@ -412,6 +439,7 @@ function switchProfessor(prof, index) {
     renderCurrentPageQuestions();
     updateProgressBarColors();
     updateSubmitButtonState();
+    updatePageWarnings();
     renderProfessorsList();
     showToast(`Switched to ${prof.name}`);
 }
@@ -496,6 +524,15 @@ function init() {
     document.getElementById('currentEmailDisplay').innerText = currentProfessor.email || '';
     
     renderCurrentPageQuestions();
+
+    const remarksBox = document.getElementById('remarksInput');
+    if (remarksBox) {
+        remarksBox.addEventListener('input', () => {
+            updateProgressBarColors();
+            updatePageWarnings();
+            updateSubmitButtonState();
+        });
+    }
     
     document.getElementById('nextBtn')?.addEventListener('click', () => goToPage(currentPage + 1));
     document.getElementById('prevBtn')?.addEventListener('click', () => goToPage(currentPage - 1));
