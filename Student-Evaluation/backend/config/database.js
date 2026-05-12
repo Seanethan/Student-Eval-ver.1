@@ -21,9 +21,9 @@ const dbConfig = {
 async function initialize() {
   try {
     await oracledb.createPool(dbConfig);
-    console.log('✅ Oracle DB pool created');
+    console.log('Oracle DB pool created');
   } catch (err) {
-    console.error('❌ Pool creation error:', err);
+    console.error('Pool creation error:', err);
     throw err;
   }
 }
@@ -34,9 +34,9 @@ async function initialize() {
 async function close() {
   try {
     await oracledb.getPool().close(10);
-    console.log('✅ Pool closed');
+    console.log('Pool closed');
   } catch (err) {
-    console.error('❌ Pool close error:', err);
+    console.error(' Pool close error:', err);
   }
 }
 
@@ -56,7 +56,7 @@ async function execute(sql, binds = {}, options = {}) {
 
     return result;
   } catch (err) {
-    console.error('❌ DB Execute Error:', err);
+    console.error(' DB Execute Error:', err);
     throw err;
   } finally {
     if (connection) await connection.close();
@@ -79,7 +79,7 @@ async function executeTransaction(callback) {
 
   } catch (err) {
     if (connection) await connection.rollback();
-    console.error('❌ Transaction Error:', err);
+    console.error(' Transaction Error:', err);
     throw err;
 
   } finally {

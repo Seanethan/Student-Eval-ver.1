@@ -3,7 +3,13 @@ const oracledb = require('oracledb');
 
 const getStudentProfessors = async (req, res) => {
   try {
-    const studentNo = req.studentNo;
+    const studentNo = req.studentNo || req.studentId || req.headers['x-student-number'];
+
+    if (!studentNo) {
+      return res.status(400).json({ error: 'Student number is required' });
+    }
+
+    console.log("FETCHING PROFESSORS FOR:", studentNo);
 
     const sql = `
       SELECT DISTINCT 
@@ -28,8 +34,10 @@ const getStudentProfessors = async (req, res) => {
     const result = await db.execute(
       sql,
       { studentNo },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT } // 🔥 IMPORTANT FIX
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
+
+    console.log("PROFESSORS FOUND:", result.rows.length);
 
     res.json({
       success: true,
@@ -37,6 +45,7 @@ const getStudentProfessors = async (req, res) => {
     });
 
   } catch (err) {
+    console.error("Professor fetch error:", err);
     res.status(500).json({ error: err.message });
   }
 };

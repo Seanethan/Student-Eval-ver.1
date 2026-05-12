@@ -39,49 +39,43 @@ async function fetchInitialData() {
         });
         const profData = await profResponse.json();
         
-if (profData.success && profData.professors.length > 0) {
-    professors = profData.professors.map((prof, index) => ({
-    ...prof,
+        console.log("PROF DATA:", profData);
 
-    enrollmentId:
-        prof.ENROLLMENT_ID ??   // 🔥 ORACLE FIX
-        prof.enrollment_id ??
-        prof.enrollmentId ??
-        prof.PROFESSOR_ID,
-
-    colorIndex: index % professorColors.length,
-    evaluated: prof.EVALUATED === 1 || prof.evaluated === 1
-}));
-console.log("RAW FIRST PROF:", profData.professors[0]);
-console.log("MAPPED FIRST PROF:", professors[0]);
-
-    console.log("PROFESSORS AFTER MAPPING:", professors);
-
+        if (profData.success && profData.professors.length > 0) {
+            professors = profData.professors.map((prof, index) => ({
+                name: prof.NAME || prof.name || '',
+                course: prof.SUBJECT_CODE || prof.subject_code || '',
+                email: prof.EMAIL || prof.email || '',
+                enrollmentId:
+                    prof.ENROLLMENT_ID ??
+                    prof.enrollment_id ??
+                    prof.enrollmentId ??
+                    prof.PROFESSOR_ID,
+                colorIndex: index % professorColors.length,
+                evaluated: prof.EVALUATED === 1 || prof.evaluated === 1
+            }));
+            console.log("PROFESSORS AFTER MAPPING:", professors);
         } else {
-            // Fallback to static data
-            professors = [
-                { name: "Nicky Balew", course: "IM101", email: "nickybalew@gmail.com", colorIndex: 0, evaluated: false },
-                { name: "Awee Balew", course: "CS 202", email: "awee.balew@qcu.edu", colorIndex: 1, evaluated: false },
-                { name: "Redenton Balew", course: "IT 305", email: "redenton@qcu.edu", colorIndex: 2, evaluated: false },
-                { name: "Professor 4", course: "DS 401", email: "prof4@qcu.edu", colorIndex: 3, evaluated: false },
-                { name: "Professor 5", course: "AI 501", email: "prof5@qcu.edu", colorIndex: 4, evaluated: false }
-            ];
+            console.log("USING FALLBACK PROFESSORS");
+            professors = getFallbackProfessors();
         }
 
         // Fetch questions
         const questResponse = await fetch('http://localhost:3000/api/evaluations/questions');
         const questData = await questResponse.json();
         
-        if (questData.success && questData.categories.length > 0) {
-            // Flatten questions from categories
+        console.log("QUEST DATA:", questData);
+
+        if (questData.success && questData.categories && questData.categories.length > 0) {
             questions = [];
             questData.categories.forEach(category => {
                 category.questions.forEach(q => {
                     questions.push(q.questionText);
                 });
             });
+            console.log("QUESTIONS FROM DB:", questions.length);
         } else {
-            // Fallback to static questions
+            console.log("USING FALLBACK QUESTIONS");
             questions = getStaticQuestions();
         }
 
@@ -90,21 +84,27 @@ console.log("MAPPED FIRST PROF:", professors[0]);
         if (currentProfessorIndex === -1) currentProfessorIndex = 0;
         currentProfessor = professors[currentProfessorIndex];
         
+        console.log("CURRENT PROFESSOR SET TO:", currentProfessor);
+        
         init();
     } catch (error) {
         console.error('Error fetching data:', error);
-        // Use static data as fallback
-        professors = [
-            { name: "Nicky Balew", course: "IM101", email: "nickybalew@gmail.com", colorIndex: 0, evaluated: false },
-            { name: "Awee Balew", course: "CS 202", email: "awee.balew@qcu.edu", colorIndex: 1, evaluated: false },
-            { name: "Redenton Balew", course: "IT 305", email: "redenton@qcu.edu", colorIndex: 2, evaluated: false },
-            { name: "Professor 4", course: "DS 401", email: "prof4@qcu.edu", colorIndex: 3, evaluated: false },
-            { name: "Professor 5", course: "AI 501", email: "prof5@qcu.edu", colorIndex: 4, evaluated: false }
-        ];
+        professors = getFallbackProfessors();
         questions = getStaticQuestions();
         currentProfessor = professors[0];
+        console.log("FALLBACK PROFESSOR:", currentProfessor);
         init();
     }
+}
+
+function getFallbackProfessors() {
+    return [
+        { name: "Nicky Balew", course: "IM101", email: "nickybalew@gmail.com", enrollmentId: 1, colorIndex: 0, evaluated: false },
+        { name: "Awee Balew", course: "CS 202", email: "awee.balew@qcu.edu", enrollmentId: 2, colorIndex: 1, evaluated: false },
+        { name: "Redenton Balew", course: "IT 305", email: "redenton@qcu.edu", enrollmentId: 3, colorIndex: 2, evaluated: false },
+        { name: "Professor 4", course: "DS 401", email: "prof4@qcu.edu", enrollmentId: 4, colorIndex: 3, evaluated: false },
+        { name: "Professor 5", course: "AI 501", email: "prof5@qcu.edu", enrollmentId: 5, colorIndex: 4, evaluated: false }
+    ];
 }
 
 function getStaticQuestions() {
@@ -133,6 +133,7 @@ function getStaticQuestions() {
 }
 
 function getCurrentAnswers() {
+    if (!currentProfessor) return [];
     if (!evaluationsStore[currentProfessor.name]) {
         evaluationsStore[currentProfessor.name] = { answers: new Array(questions.length).fill(null) };
     }
@@ -159,7 +160,7 @@ function isPageComplete(pageNum) {
 
 function isAllQuestionsComplete() {
     const answers = getCurrentAnswers();
-    return answers.every(a => a !== null);
+    return answers.length > 0 && answers.every(a => a !== null);
 }
 
 function isRemarksComplete() {
@@ -275,9 +276,10 @@ function renderQuestionsForIndices(indices, answers) {
                 </label>
             `;
         }
+        const questionText = questions[idx] || '';
         html += `
             <div class="question-card bg-white rounded-xl p-6 border border-gray-200 flex justify-between items-center gap-4 shadow-sm">
-                <p class="text-gray-800 text-base flex-1"><span class="font-bold mr-2 text-indigo-600">${idx+1}.</span> ${escapeHtml(questions[idx])}</p>
+                <p class="text-gray-800 text-base flex-1"><span class="font-bold mr-2 text-indigo-600">${idx+1}.</span> ${escapeHtml(questionText)}</p>
                 <div class="flex items-center gap-3 shrink-0">
                     <span class="text-[10px] font-bold text-gray-400 uppercase">Poor</span>
                     <div class="flex gap-2">
@@ -336,36 +338,31 @@ function goToPage(pageNum) {
     updatePageWarnings();
     document.getElementById('mainContentArea').scrollTop = 0;
 }
-console.log(currentProfessor);
+
 async function submitAndContinue() {
     if (!isAllQuestionsComplete() || !isRemarksComplete()) {
         showToast("Cannot submit! Please answer all questions first.");
         return;
     }
-if (!currentProfessor.enrollmentId) {
-    console.error("Missing enrollmentId:", currentProfessor);
-    showToast("Enrollment ID missing. Check backend mapping.");
-    return;
-}
+
+    if (!currentProfessor || !currentProfessor.enrollmentId) {
+        console.error("Missing enrollmentId:", currentProfessor);
+        showToast("Enrollment ID missing. Cannot submit.");
+        return;
+    }
+
     const responses = getCurrentAnswers().map((rating, index) => ({
         questionId: index + 1,
         rating
     }));
 
     const body = {
-    enrollmentId: currentProfessor?.enrollmentId, // 🔥 SAFE ACCESS
-    responses,
-    remarks: document.getElementById('remarksInput')?.value || ""
-};
+        enrollmentId: currentProfessor.enrollmentId,
+        responses,
+        remarks: document.getElementById('remarksInput')?.value || ""
+    };
 
-console.log("SUBMIT PAYLOAD:", body);
-
-// 🔥 BLOCK BAD REQUEST EARLY
-if (!body.enrollmentId) {
-    console.error("Missing enrollmentId:", currentProfessor);
-    showToast("Enrollment ID missing. Check backend data.");
-    return;
-}
+    console.log("SUBMIT PAYLOAD:", body);
 
     try {
         const res = await fetch('http://localhost:3000/api/evaluations/submit', {
@@ -377,7 +374,6 @@ if (!body.enrollmentId) {
             body: JSON.stringify(body)
         });
 
-        // 🔥 IMPORTANT: handle backend errors
         if (!res.ok) {
             const errorText = await res.text();
             console.error("Backend error:", errorText);
@@ -385,11 +381,14 @@ if (!body.enrollmentId) {
             return;
         }
 
+        const data = await res.json();
+        console.log("SUBMIT RESPONSE:", data);
+
         professors[currentProfessorIndex].evaluated = true;
 
         showToast(`Evaluation completed for ${currentProfessor.name}!`);
 
-        // move to next professor...
+        // Move to next professor
         let nextIndex = professors.findIndex(p => !p.evaluated);
 
         if (nextIndex !== -1) {
@@ -415,7 +414,7 @@ if (!body.enrollmentId) {
             renderProfessorsList();
 
         } else {
-            showToast("All professors evaluated.");
+            showToast("All professors evaluated. Thank you!");
             setTimeout(() => {
                 window.location.href = "StudentDashboard.html?completed=true";
             }, 1500);
@@ -425,19 +424,15 @@ if (!body.enrollmentId) {
         console.error("Submit error:", error);
         showToast("Network error. Try again.");
     }
-
-    console.log("SUBMIT FUNCTION CALLED");
-
-    console.log("CURRENT PROFESSOR:", currentProfessor);
-console.log("ENROLLMENT ID:", currentProfessor.enrollmentId);
 }
 
-
 function getInitials(name) {
+    if (!name) return "??";
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 }
 
 function updateProfessorAvatar(prof) {
+    if (!prof) return;
     const avatarDiv = document.getElementById('currentProfAvatar');
     const colorData = professorColors[prof.colorIndex % professorColors.length];
     const initials = getInitials(prof.name);
@@ -528,6 +523,7 @@ function updateDateTime() {
 }
 
 function escapeHtml(str) {
+    if (!str) return '';
     return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 }
 
@@ -545,19 +541,23 @@ function showToast(msg) {
 }
 
 function init() {
-    renderProfessorsList();
-    updateDateTime();
-    setInterval(updateDateTime, 1000);
-    updateProfessorAvatar(currentProfessor);
+    if (!currentProfessor) {
+        console.error("No current professor - cannot initialize");
+        return;
+    }
     
     if (!evaluationsStore[currentProfessor.name]) {
         evaluationsStore[currentProfessor.name] = { answers: new Array(questions.length).fill(null) };
     }
     
     document.getElementById('currentProfNameDisplay').innerText = currentProfessor.name;
-    document.getElementById('currentCourseDisplay').innerText = `Course Code: ${currentProfessor.course}`;
+    document.getElementById('currentCourseDisplay').innerText = `Course Code: ${currentProfessor.course || ''}`;
     document.getElementById('currentEmailDisplay').innerText = currentProfessor.email || '';
     
+    renderProfessorsList();
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    updateProfessorAvatar(currentProfessor);
     renderCurrentPageQuestions();
 
     const remarksBox = document.getElementById('remarksInput');

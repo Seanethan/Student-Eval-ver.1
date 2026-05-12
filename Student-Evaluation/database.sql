@@ -103,7 +103,7 @@ CREATE TABLE Responses (
 -- REMARKS
 CREATE TABLE Remarks (
     evaluation_id NUMBER PRIMARY KEY,
-    remarks_text CLOB,
+    remarks_text VARCHAR2(4000),
 
     CONSTRAINT fk_rem_eval FOREIGN KEY (evaluation_id)
         REFERENCES Evaluations(evaluation_id)
@@ -259,13 +259,6 @@ INSERT INTO Enrollments (student_id, class_id) VALUES ('24-1234', 5);
 
 
 
-DROP TABLE system.Evaluations CASCADE CONSTRAINTS;
-DROP TABLE system.Professors CASCADE CONSTRAINTS;
-DROP TABLE system.Subjects CASCADE CONSTRAINTS;
-DROP TABLE system.Students CASCADE CONSTRAINTS;
-DROP TABLE system.Classes CASCADE CONSTRAINTS;
-DROP TABLE system.Enrollments CASCADE CONSTRAINTS;
-DROP TABLE system.Remarks CASCADE CONSTRAINTS;
 
 SELECT * FROM system.Students;
 
@@ -273,6 +266,18 @@ SELECT *
 FROM system.remarks
 ORDER BY evaluation_id DESC;
 
+SELECT * from system.Professors;
+
 SELECT evaluation_id, remarks_text
 FROM system.remarks
 ORDER BY evaluation_id DESC;
+
+/*
+DROP TABLE system.Evaluations CASCADE CONSTRAINTS;
+DROP TABLE system.Professors CASCADE CONSTRAINTS;
+DROP TABLE system.Subjects CASCADE CONSTRAINTS;
+DROP TABLE system.Students CASCADE CONSTRAINTS;
+DROP TABLE system.Classes CASCADE CONSTRAINTS;
+DROP TABLE system.Enrollments CASCADE CONSTRAINTS;
+DROP TABLE system.Remarks CASCADE CONSTRAINTS;
+*/
