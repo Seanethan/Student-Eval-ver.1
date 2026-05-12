@@ -1,11 +1,11 @@
 const authMiddleware = (req, res, next) => {
-  const studentNo = req.headers['x-student-number'];
-  
-  if (!studentNo) {
-    return res.status(401).json({ error: 'Student number is required' });
+  const studentId = req.headers['x-student-number'];
+
+  if (!studentId || studentId.trim() === "") {
+    return res.status(401).json({ error: 'Student ID is required' });
   }
-  
-  req.studentNo = studentNo;
+
+  req.studentId = studentId.trim();
   next();
 };
 

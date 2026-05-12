@@ -2,51 +2,94 @@ const oracledb = require('oracledb');
 require('dotenv').config();
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-oracledb.autoCommit = true;
+
+// ⚠️ Turn OFF global autoCommit (important for transactions)
+oracledb.autoCommit = false;
 
 const dbConfig = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  connectString: process.env.DB_CONNECT_STRING
+  connectString: process.env.DB_CONNECT_STRING,
+  poolMin: 2,
+  poolMax: 10,
+  poolIncrement: 1
 };
 
+// =========================
+// INIT POOL
+// =========================
 async function initialize() {
   try {
     await oracledb.createPool(dbConfig);
-    console.log('Oracle Database connection pool created');
+    console.log('✅ Oracle DB pool created');
   } catch (err) {
-    console.error('Error creating connection pool:', err);
+    console.error('❌ Pool creation error:', err);
     throw err;
   }
 }
 
+// =========================
+// CLOSE POOL
+// =========================
 async function close() {
   try {
-    await oracledb.getPool().close();
-    console.log('Connection pool closed');
+    await oracledb.getPool().close(10);
+    console.log('✅ Pool closed');
   } catch (err) {
-    console.error('Error closing connection pool:', err);
+    console.error('❌ Pool close error:', err);
   }
 }
 
-async function execute(sql, binds = [], options = {}) {
+// =========================
+// SIMPLE EXECUTE (AUTO COMMIT OPTION)
+// =========================
+async function execute(sql, binds = {}, options = {}) {
   let connection;
+
   try {
     connection = await oracledb.getConnection();
-    const result = await connection.execute(sql, binds, options);
+
+    const result = await connection.execute(sql, binds, {
+      autoCommit: true,
+      ...options
+    });
+
     return result;
   } catch (err) {
-    console.error('Database error:', err);
+    console.error('❌ DB Execute Error:', err);
     throw err;
   } finally {
-    if (connection) {
-      try {
-        await connection.close();
-      } catch (err) {
-        console.error('Error closing connection:', err);
-      }
-    }
+    if (connection) await connection.close();
   }
 }
 
-module.exports = { initialize, close, execute };
+// =========================
+// TRANSACTION SUPPORT (IMPORTANT FOR EVALUATIONS)
+// =========================
+async function executeTransaction(callback) {
+  let connection;
+
+  try {
+    connection = await oracledb.getConnection();
+
+    const result = await callback(connection);
+
+    await connection.commit();
+    return result;
+
+  } catch (err) {
+    if (connection) await connection.rollback();
+    console.error('❌ Transaction Error:', err);
+    throw err;
+
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+module.exports = {
+  initialize,
+  close,
+  execute,
+  executeTransaction
+};

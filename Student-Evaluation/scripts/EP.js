@@ -1,3 +1,6 @@
+console.log("EP.js loaded");
+
+
 // ======================== STUDENT DATA ========================
 const studentNo = localStorage.getItem("studentNo");
 if (studentNo) {
@@ -36,12 +39,24 @@ async function fetchInitialData() {
         });
         const profData = await profResponse.json();
         
-        if (profData.success && profData.professors.length > 0) {
-            professors = profData.professors.map((prof, index) => ({
-                ...prof,
-                colorIndex: index % professorColors.length,
-                evaluated: prof.evaluated
-            }));
+if (profData.success && profData.professors.length > 0) {
+    professors = profData.professors.map((prof, index) => ({
+    ...prof,
+
+    enrollmentId:
+        prof.ENROLLMENT_ID ??   // 🔥 ORACLE FIX
+        prof.enrollment_id ??
+        prof.enrollmentId ??
+        prof.PROFESSOR_ID,
+
+    colorIndex: index % professorColors.length,
+    evaluated: prof.EVALUATED === 1 || prof.evaluated === 1
+}));
+console.log("RAW FIRST PROF:", profData.professors[0]);
+console.log("MAPPED FIRST PROF:", professors[0]);
+
+    console.log("PROFESSORS AFTER MAPPING:", professors);
+
         } else {
             // Fallback to static data
             professors = [
@@ -321,82 +336,102 @@ function goToPage(pageNum) {
     updatePageWarnings();
     document.getElementById('mainContentArea').scrollTop = 0;
 }
-
+console.log(currentProfessor);
 async function submitAndContinue() {
     if (!isAllQuestionsComplete() || !isRemarksComplete()) {
         showToast("Cannot submit! Please answer all questions first.");
         return;
     }
-    
-    try {
-        // Submit to backend
-        const responses = getCurrentAnswers().map((rating, index) => ({
-            questionId: index + 1,
-            rating: rating
-        }));
+if (!currentProfessor.enrollmentId) {
+    console.error("Missing enrollmentId:", currentProfessor);
+    showToast("Enrollment ID missing. Check backend mapping.");
+    return;
+}
+    const responses = getCurrentAnswers().map((rating, index) => ({
+        questionId: index + 1,
+        rating
+    }));
 
-        await fetch('http://localhost:3000/api/evaluations/submit', {
+    const body = {
+    enrollmentId: currentProfessor?.enrollmentId, // 🔥 SAFE ACCESS
+    responses,
+    remarks: document.getElementById('remarksInput')?.value || ""
+};
+
+console.log("SUBMIT PAYLOAD:", body);
+
+// 🔥 BLOCK BAD REQUEST EARLY
+if (!body.enrollmentId) {
+    console.error("Missing enrollmentId:", currentProfessor);
+    showToast("Enrollment ID missing. Check backend data.");
+    return;
+}
+
+    try {
+        const res = await fetch('http://localhost:3000/api/evaluations/submit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'x-student-number': studentNo
             },
-            body: JSON.stringify({
-                enrollmentId: currentProfessor.enrollmentId,
-                responses: responses
-            })
+            body: JSON.stringify(body)
         });
 
-        professors[currentProfessorIndex].evaluated = true;
-        showToast(`Evaluation completed for ${currentProfessor.name}!`);
-        
-        let nextIndex = -1;
-        for (let i = 0; i < professors.length; i++) {
-            if (!professors[i].evaluated) {
-                nextIndex = i;
-                break;
-            }
+        // 🔥 IMPORTANT: handle backend errors
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error("Backend error:", errorText);
+            showToast("Submission failed. Check console.");
+            return;
         }
-        
+
+        professors[currentProfessorIndex].evaluated = true;
+
+        showToast(`Evaluation completed for ${currentProfessor.name}!`);
+
+        // move to next professor...
+        let nextIndex = professors.findIndex(p => !p.evaluated);
+
         if (nextIndex !== -1) {
             currentProfessorIndex = nextIndex;
             currentProfessor = professors[currentProfessorIndex];
             currentPage = 0;
 
-            const remarksBox = document.getElementById('remarksInput');
-            if (remarksBox) {
-            remarksBox.value = "";
-            }
-        
-            
+            document.getElementById('remarksInput').value = "";
+
             document.getElementById('currentProfNameDisplay').innerText = currentProfessor.name;
             document.getElementById('currentCourseDisplay').innerText = `Course Code: ${currentProfessor.course}`;
             document.getElementById('currentEmailDisplay').innerText = currentProfessor.email || '';
+
             updateProfessorAvatar(currentProfessor);
-            
-            if (!evaluationsStore[currentProfessor.name]) {
-                evaluationsStore[currentProfessor.name] = { answers: new Array(questions.length).fill(null) };
-            }
-            
+
+            evaluationsStore[currentProfessor.name] = {
+                answers: new Array(questions.length).fill(null)
+            };
+
             goToPage(0);
             renderCurrentPageQuestions();
-            updateProgressBarColors();
-            updatePageWarnings();
             updateSubmitButtonState();
             renderProfessorsList();
-            
-            showToast(`Moving to next professor: ${currentProfessor.name}`);
+
         } else {
             showToast("All professors evaluated.");
             setTimeout(() => {
                 window.location.href = "StudentDashboard.html?completed=true";
             }, 1500);
         }
+
     } catch (error) {
-        console.error('Error submitting evaluation:', error);
-        showToast("Error submitting evaluation. Please try again.");
+        console.error("Submit error:", error);
+        showToast("Network error. Try again.");
     }
+
+    console.log("SUBMIT FUNCTION CALLED");
+
+    console.log("CURRENT PROFESSOR:", currentProfessor);
+console.log("ENROLLMENT ID:", currentProfessor.enrollmentId);
 }
+
 
 function getInitials(name) {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
