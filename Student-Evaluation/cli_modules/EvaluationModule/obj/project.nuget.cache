@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ucCHivUFJXc=",
+  "dgSpecHash": "MUYHBckbJPg=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Admin\\OneDrive\\Desktop\\PLProject2.0\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj",
+  "projectFilePath": "C:\\Users\\Admin\\OneDrive\\Desktop\\PLPROJECT REAL\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Admin\\.nuget\\packages\\ini-parser-netstandard\\2.5.2\\ini-parser-netstandard.2.5.2.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\oracle.manageddataaccess.core\\23.5.1\\oracle.manageddataaccess.core.23.5.1.nupkg.sha512",

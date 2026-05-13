@@ -1,0 +1,14 @@
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\EvaluationModule.exe
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\EvaluationModule.dll
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\EvaluationModule.deps.json
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\EvaluationModule.runtimeconfig.json
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\EvaluationModule.pdb
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\INIFileParser.dll
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\Oracle.ManagedDataAccess.dll
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\System.Configuration.ConfigurationManager.dll
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\System.Diagnostics.EventLog.Messages.dll
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\System.Diagnostics.EventLog.dll
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\System.Diagnostics.PerformanceCounter.dll
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\System.DirectoryServices.Protocols.dll
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\System.Security.Cryptography.Pkcs.dll
+C:\Users\Admin\OneDrive\Desktop\PLPROJECT REAL\Student-Eval-ver.1\Student-Evaluation\cli_modules\EvaluationModule\bin\Release\net8.0\win-x64\publish\System.Security.Cryptography.ProtectedData.dll

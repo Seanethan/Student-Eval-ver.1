@@ -1,15 +1,14 @@
-
 using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Data;
 using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 
 // ═══════════════════════════════════════════════════════════════
 //  EVALUATION MODULE  (C#)
-//  Aligned to DB schema:
-//    Professors, Classes, Subjects, Enrollments,
-//    Evaluations, Responses, Questions, Categories, Remarks
+//  Now uses PL/SQL procedures (evaluation_pkg) for all reports
 // ═══════════════════════════════════════════════════════════════
 class EvaluationModule
 {
@@ -58,10 +57,10 @@ class EvaluationModule
 
             switch (choice)
             {
-                case "1": ShowSummary();     break;
-                case "2": ShowAvgRatings();  break;
+                case "1": ShowSummary(); break;
+                case "2": ShowAvgRatings(); break;
                 case "3": ShowDetailPrompt(); break;
-                case "4": ShowRemarks();     break;
+                case "4": ShowRemarks(); break;
                 case "0": return;
                 default:
                     Console.WriteLine("  ✖  Invalid option.");
@@ -71,17 +70,68 @@ class EvaluationModule
         }
     }
 
+    // ──────────────────────────────────────────────────────────
+    //  Helper: Execute a stored procedure that returns a REF CURSOR
+    //  Parameters must be added in the exact order as in the procedure signature.
+    //  The last parameter is always the output REF CURSOR.
+    // ──────────────────────────────────────────────────────────
+    static void RunStoredProcedure(string procName,
+                                   OracleParameter[]? inputParams,
+                                   Action<OracleDataReader> processReader)
+    {
+        try
+        {
+            using var conn = new OracleConnection(connStr);
+            conn.Open();
+            using var cmd = new OracleCommand(procName, conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // Add input parameters in the order they appear
+            if (inputParams != null)
+            {
+                foreach (var p in inputParams)
+                    cmd.Parameters.Add(p);
+            }
+
+            // Add the output REF CURSOR parameter (must be last)
+            var cursorParam = new OracleParameter("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
+            cmd.Parameters.Add(cursorParam);
+
+            cmd.ExecuteNonQuery();
+
+            using var reader = ((OracleRefCursor)cursorParam.Value).GetDataReader();
+            processReader(reader);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"\n  ✖  DB Error: {ex.Message}");
+        }
+    }
+
+    // Overload for procedures with no input parameters
+    static void RunStoredProcedure(string procName, Action<OracleDataReader> processReader)
+    {
+        RunStoredProcedure(procName, null, processReader);
+    }
+
     // ── [1] Summary ───────────────────────────────────────────
     static void ShowSummary()
     {
         Banner();
         Console.WriteLine("  ┌─ EVALUATION SUMMARY — ALL PROFESSORS\n");
-        RunTable(
-            Flat(cfg["EVALUATION.fetch_all_evaluations"]),
-            null,
-            new[] { "PROFESSOR_NAME", "SUBJECT_CODE", "SECTION", "EVAL_COUNT", "TOTAL_ENROLLED" },
-            new[] { -28, -12, -8, 10, 7 }
-        );
+        Console.WriteLine($"  {"PROFESSOR",-28} {"SUBJECT",-12} {"SEC",-8} {"EVALS",10} {"ENROLLED",7}");
+        Console.WriteLine("  " + THIN);
+
+        RunStoredProcedure("evaluation_pkg.get_summary", reader =>
+        {
+            bool any = false;
+            while (reader.Read())
+            {
+                any = true;
+                Console.WriteLine($"  {reader["PROFESSOR_NAME"],-28} {reader["SUBJECT_CODE"],-12} {reader["SECTION"],-8} {reader["EVAL_COUNT"],10} {reader["TOTAL_ENROLLED"],7}");
+            }
+            if (!any) Console.WriteLine("  No data found.");
+        });
 
         Console.WriteLine();
         Console.Write("  Enter professor name to drill down (or ENTER to go back): ");
@@ -97,12 +147,16 @@ class EvaluationModule
         Console.WriteLine($"  {"PROFESSOR",-30} {"AVG RATING",10} {"RESPONSES",10}");
         Console.WriteLine("  " + THIN);
 
-        RunTable(
-            Flat(cfg["EVALUATION.fetch_avg_ratings"]),
-            null,
-            new[] { "PROFESSOR_NAME", "AVG_RATING", "TOTAL_RESPONSES" },
-            new[] { -30, 10, 10 }
-        );
+        RunStoredProcedure("evaluation_pkg.get_avg_ratings", reader =>
+        {
+            bool any = false;
+            while (reader.Read())
+            {
+                any = true;
+                Console.WriteLine($"  {reader["PROFESSOR_NAME"],-30} {reader["AVG_RATING"],10} {reader["TOTAL_RESPONSES"],10}");
+            }
+            if (!any) Console.WriteLine("  No data found.");
+        });
         Pause();
     }
 
@@ -121,42 +175,35 @@ class EvaluationModule
         Banner();
         Console.WriteLine($"  ┌─ DETAILED RATINGS — {name.ToUpper()}\n");
 
-        string sql = Flat(cfg["EVALUATION.fetch_professor_detail"]);
+        // Create input parameter with explicit size and direction
+        var param = new OracleParameter("p_professor_name", OracleDbType.Varchar2, ParameterDirection.Input);
+        param.Value = name;
+        param.Size = name.Length;  // important for VARCHAR2 binding
 
-        try
-        {
-            using var conn = new OracleConnection(connStr);
-            conn.Open();
-            using var cmd = new OracleCommand(sql, conn);
-            cmd.Parameters.Add(":professor_name", OracleDbType.Varchar2).Value = $"%{name}%";
-            using var rdr = cmd.ExecuteReader();
-
-            string currentCat = "";
-            bool   any        = false;
-
-            while (rdr.Read())
+        RunStoredProcedure("evaluation_pkg.get_professor_detail",
+            new OracleParameter[] { param },
+            reader =>
             {
-                any = true;
-                string cat = rdr["CATEGORY_NAME"].ToString()!;
-                if (cat != currentCat)
-                {
-                    currentCat = cat;
-                    Console.WriteLine($"\n  ▸ {cat}");
-                    Console.WriteLine("  " + THIN);
-                }
-                Console.WriteLine(
-                    $"    {rdr["QUESTION_TEXT"],-52}  " +
-                    $"Avg: {rdr["AVG_RATING"],5}  " +
-                    $"(n={rdr["RESPONSE_COUNT"]})");
-            }
+                string currentCat = "";
+                bool any = false;
 
-            if (!any)
-                Console.WriteLine($"  No responses found for '{name}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"\n  ✖  DB Error: {ex.Message}");
-        }
+                while (reader.Read())
+                {
+                    any = true;
+                    string cat = reader["CATEGORY_NAME"].ToString()!;
+                    if (cat != currentCat)
+                    {
+                        currentCat = cat;
+                        Console.WriteLine($"\n  ▸ {cat}");
+                        Console.WriteLine("  " + THIN);
+                    }
+                    Console.WriteLine(
+                        $"    {reader["QUESTION_TEXT"],-52}  " +
+                        $"Avg: {reader["AVG_RATING"],5}  " +
+                        $"(n={reader["RESPONSE_COUNT"]})");
+                }
+                if (!any) Console.WriteLine($"  No responses found for '{name}'.");
+            });
         Pause();
     }
 
@@ -169,83 +216,37 @@ class EvaluationModule
         string name = Console.ReadLine()?.Trim() ?? "";
         if (string.IsNullOrEmpty(name)) return;
 
-        string sql = Flat(cfg["EVALUATION.fetch_remarks"]);
+        var param = new OracleParameter("p_professor_name", OracleDbType.Varchar2, ParameterDirection.Input);
+        param.Value = name;
+        param.Size = name.Length;
 
-        try
-        {
-            using var conn = new OracleConnection(connStr);
-            conn.Open();
-            using var cmd = new OracleCommand(sql, conn);
-            cmd.Parameters.Add(":professor_name", OracleDbType.Varchar2).Value = $"%{name}%";
-            using var rdr = cmd.ExecuteReader();
-
-            bool any = false;
-            while (rdr.Read())
+        RunStoredProcedure("evaluation_pkg.get_remarks",
+            new OracleParameter[] { param },
+            reader =>
             {
-                any = true;
-                Console.WriteLine($"\n  Professor : {rdr["PROFESSOR_NAME"]}");
-                Console.WriteLine($"  Subject   : {rdr["SUBJECT_CODE"]}");
-                Console.WriteLine($"  Submitted : {rdr["DATE_SUBMITTED"]}");
-                string remarks = rdr["REMARKS_TEXT"]?.ToString() ?? "(no remarks)";
-                Console.WriteLine($"  Remarks   : {remarks}");
-                Console.WriteLine("  " + THIN);
-            }
-
-            if (!any)
-                Console.WriteLine($"  No remarks found for '{name}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"\n  ✖  DB Error: {ex.Message}");
-        }
+                bool any = false;
+                while (reader.Read())
+                {
+                    any = true;
+                    Console.WriteLine($"\n  Professor : {reader["PROFESSOR_NAME"]}");
+                    Console.WriteLine($"  Subject   : {reader["SUBJECT_CODE"]}");
+                    Console.WriteLine($"  Submitted : {reader["DATE_SUBMITTED"]}");
+                    string remarks = reader["REMARKS_TEXT"]?.ToString() ?? "(no remarks)";
+                    Console.WriteLine($"  Remarks   : {remarks}");
+                    Console.WriteLine("  " + THIN);
+                }
+                if (!any) Console.WriteLine($"  No remarks found for '{name}'.");
+            });
         Pause();
     }
 
-    // ── Generic table printer ─────────────────────────────────
-    static void RunTable(string sql, OracleParameter[]? parameters,
-                         string[] cols, int[] widths)
-    {
-        try
-        {
-            using var conn = new OracleConnection(connStr);
-            conn.Open();
-            using var cmd = new OracleCommand(sql, conn);
-            if (parameters != null)
-                foreach (var p in parameters) cmd.Parameters.Add(p);
-            using var rdr = cmd.ExecuteReader();
-
-            bool any = false;
-            while (rdr.Read())
-            {
-                any = true;
-                var parts = new List<string>();
-                for (int i = 0; i < cols.Length; i++)
-                {
-                    string val  = rdr[cols[i]]?.ToString() ?? "";
-                    int    w    = widths[i];
-                    parts.Add(w < 0
-                        ? val.PadRight(-w)
-                        : val.PadLeft(w));
-                }
-                Console.WriteLine("  " + string.Join(" ", parts));
-            }
-
-            if (!any)
-                Console.WriteLine("  No data found.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"\n  ✖  DB Error: {ex.Message}");
-        }
-    }
-
-    // ── Custom INI parser ─────────────────────────────────────
+    // ── Custom INI parser (unchanged) ─────────────────────────
     static Dictionary<string, string> LoadIni(string path)
     {
-        var    result  = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         string section = "";
-        string key     = "";
-        var    valBuf  = new System.Text.StringBuilder();
+        string key = "";
+        var valBuf = new System.Text.StringBuilder();
 
         void Flush()
         {

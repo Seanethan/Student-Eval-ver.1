@@ -330,3 +330,124 @@ DELETE FROM system.evaluations;
 DELETE FROM system.remarks;
 DELETE FROM system.questions;
 COMMIT;
+
+
+-- RUN THIS CODE AT LEAST ONCE
+-- Create package specification
+CREATE OR REPLACE PACKAGE evaluation_pkg IS
+    -- Summary: all professors with evaluation count and total enrolled
+    PROCEDURE get_summary(p_cursor OUT SYS_REFCURSOR);
+    
+    -- Overall average rating per professor
+    PROCEDURE get_avg_ratings(p_cursor OUT SYS_REFCURSOR);
+    
+    -- Detailed ratings (per question) for a given professor (supports partial name match)
+    PROCEDURE get_professor_detail(p_professor_name IN VARCHAR2, p_cursor OUT SYS_REFCURSOR);
+    
+    -- Remarks for a given professor (supports partial name match)
+    PROCEDURE get_remarks(p_professor_name IN VARCHAR2, p_cursor OUT SYS_REFCURSOR);
+END;
+/
+
+
+-- Create package body
+CREATE OR REPLACE PACKAGE BODY evaluation_pkg IS
+
+    PROCEDURE get_summary(p_cursor OUT SYS_REFCURSOR) IS
+    BEGIN
+        OPEN p_cursor FOR
+            SELECT 
+                p.NAME                      AS PROFESSOR_NAME,
+                s.SUBJECT_CODE,
+                s.SUBJECT_NAME,
+                c.SECTION,
+                c.SCHOOL_YEAR,
+                COUNT(ev.EVALUATION_ID)     AS EVAL_COUNT,
+                COUNT(e.ENROLLMENT_ID)      AS TOTAL_ENROLLED
+            FROM system.Professors p
+            JOIN system.Classes     c   ON p.PROFESSOR_ID  = c.PROFESSOR_ID
+            JOIN system.Subjects    s   ON c.SUBJECT_CODE  = s.SUBJECT_CODE
+            JOIN system.Enrollments e   ON c.CLASS_ID      = e.CLASS_ID
+            LEFT JOIN system.Evaluations ev ON e.ENROLLMENT_ID = ev.ENROLLMENT_ID
+            GROUP BY
+                p.NAME,
+                s.SUBJECT_CODE,
+                s.SUBJECT_NAME,
+                c.SECTION,
+                c.SCHOOL_YEAR
+            ORDER BY p.NAME, s.SUBJECT_CODE;
+    END get_summary;
+
+    PROCEDURE get_avg_ratings(p_cursor OUT SYS_REFCURSOR) IS
+    BEGIN
+        OPEN p_cursor FOR
+            SELECT
+                p.NAME                      AS PROFESSOR_NAME,
+                ROUND(AVG(r.RATING), 2)     AS AVG_RATING,
+                COUNT(r.RESPONSE_ID)        AS TOTAL_RESPONSES
+            FROM system.Professors p
+            JOIN system.Classes      c   ON p.PROFESSOR_ID   = c.PROFESSOR_ID
+            JOIN system.Enrollments  e   ON c.CLASS_ID       = e.CLASS_ID
+            JOIN system.Evaluations  ev  ON e.ENROLLMENT_ID  = ev.ENROLLMENT_ID
+            JOIN system.Responses    r   ON ev.EVALUATION_ID = r.EVALUATION_ID
+            WHERE r.RATING IS NOT NULL
+            GROUP BY p.NAME
+            ORDER BY AVG_RATING DESC;
+    END get_avg_ratings;
+
+    PROCEDURE get_professor_detail(p_professor_name IN VARCHAR2, p_cursor OUT SYS_REFCURSOR) IS
+    BEGIN
+        OPEN p_cursor FOR
+            SELECT
+                cat.CATEGORY_NAME,
+                q.QUESTION_TEXT,
+                ROUND(AVG(r.RATING), 2)  AS AVG_RATING,
+                COUNT(r.RESPONSE_ID)     AS RESPONSE_COUNT
+            FROM system.Professors p
+            JOIN system.Classes      c   ON p.PROFESSOR_ID   = c.PROFESSOR_ID
+            JOIN system.Enrollments  e   ON c.CLASS_ID       = e.CLASS_ID
+            JOIN system.Evaluations  ev  ON e.ENROLLMENT_ID  = ev.ENROLLMENT_ID
+            JOIN system.Responses    r   ON ev.EVALUATION_ID = r.EVALUATION_ID
+            JOIN system.Questions    q   ON r.QUESTION_ID    = q.QUESTION_ID
+            JOIN system.Categories   cat ON q.CATEGORY_ID    = cat.CATEGORY_ID
+            WHERE UPPER(p.NAME) LIKE UPPER('%' || p_professor_name || '%')
+            GROUP BY cat.CATEGORY_NAME, q.QUESTION_TEXT
+            ORDER BY cat.CATEGORY_NAME, q.QUESTION_TEXT;
+    END get_professor_detail;
+
+    PROCEDURE get_remarks(p_professor_name IN VARCHAR2, p_cursor OUT SYS_REFCURSOR) IS
+    BEGIN
+        OPEN p_cursor FOR
+            SELECT
+                p.NAME          AS PROFESSOR_NAME,
+                s.SUBJECT_CODE,
+                ev.DATE_SUBMITTED,
+                rm.REMARKS_TEXT
+            FROM system.Evaluations  ev
+            JOIN system.Enrollments  e   ON ev.ENROLLMENT_ID = e.ENROLLMENT_ID
+            JOIN system.Classes      c   ON e.CLASS_ID       = c.CLASS_ID
+            JOIN system.Professors   p   ON c.PROFESSOR_ID   = p.PROFESSOR_ID
+            JOIN system.Subjects     s   ON c.SUBJECT_CODE   = s.SUBJECT_CODE
+            LEFT JOIN system.Remarks rm  ON rm.EVALUATION_ID = ev.EVALUATION_ID
+            WHERE UPPER(p.NAME) LIKE UPPER('%' || p_professor_name || '%')
+            ORDER BY ev.DATE_SUBMITTED DESC;
+    END get_remarks;
+
+END evaluation_pkg;
+/
+--TILL HERE
+
+--CHECK IF WORKING
+DESC evaluation_pkg.get_professor_detail;
+SELECT procedure_name FROM user_procedures WHERE object_name = 'EVALUATION_PKG';
+
+VARIABLE rc REFCURSOR;
+EXEC evaluation_pkg.get_professor_detail('ProfName', :rc);
+PRINT rc;
+
+--GIVE ACCESS TO SYSTEM IF OWNER IS SYS IF NOT CHANGE WHAT EVER THE USER IS
+CREATE PUBLIC SYNONYM evaluation_pkg FOR SYS.evaluation_pkg;
+GRANT EXECUTE ON SYS.evaluation_pkg TO SYSTEM;
+
+--DROP PROCEDURE
+DROP PACKAGE evaluation_pkg;

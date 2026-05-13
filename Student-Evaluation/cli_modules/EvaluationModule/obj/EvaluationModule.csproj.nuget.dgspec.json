@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Admin\\OneDrive\\Desktop\\PLProject2.0\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj": {}
+    "C:\\Users\\Admin\\OneDrive\\Desktop\\PLPROJECT REAL\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Admin\\OneDrive\\Desktop\\PLProject2.0\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj": {
+    "C:\\Users\\Admin\\OneDrive\\Desktop\\PLPROJECT REAL\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Admin\\OneDrive\\Desktop\\PLProject2.0\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj",
+        "projectUniqueName": "C:\\Users\\Admin\\OneDrive\\Desktop\\PLPROJECT REAL\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj",
         "projectName": "EvaluationModule",
-        "projectPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\PLProject2.0\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj",
+        "projectPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\PLPROJECT REAL\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj",
         "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\PLProject2.0\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\obj\\",
+        "outputPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\PLPROJECT REAL\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -76,6 +76,11 @@
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "win-x64": {
+          "#import": []
         }
       }
     }
