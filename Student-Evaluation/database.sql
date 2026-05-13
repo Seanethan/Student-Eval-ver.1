@@ -272,12 +272,188 @@ SELECT evaluation_id, remarks_text
 FROM system.remarks
 ORDER BY evaluation_id DESC;
 
-/*
+
 DROP TABLE system.Evaluations CASCADE CONSTRAINTS;
 DROP TABLE system.Professors CASCADE CONSTRAINTS;
 DROP TABLE system.Subjects CASCADE CONSTRAINTS;
 DROP TABLE system.Students CASCADE CONSTRAINTS;
 DROP TABLE system.Classes CASCADE CONSTRAINTS;
 DROP TABLE system.Enrollments CASCADE CONSTRAINTS;
+DROP TABLE system.Forms CASCADE CONSTRAINTS;
+DROP TABLE system.Categories CASCADE CONSTRAINTS;
+DROP TABLE system.Questions CASCADE CONSTRAINTS;
+DROP TABLE system.Responses CASCADE CONSTRAINTS;
 DROP TABLE system.Remarks CASCADE CONSTRAINTS;
+
 */
+SELECT * FROM enrollments WHERE enrollment_id = 24-1234;
+
+SELECT * FROM Enrollments;
+
+SELECT enrollment_id, student_id, class_id 
+FROM Enrollments 
+WHERE student_id = '24-1234';
+
+-- 1. Check if student exists
+SELECT * FROM system.students WHERE student_id = '24-1234';
+-- Expected: 1 row
+
+-- 2. Check enrollments for this student
+SELECT * FROM system.enrollments WHERE student_id = '24-1234';
+-- Expected: 5 rows (class_id 1-5)
+
+-- 3. Check if classes exist for those enrollments
+SELECT * FROM system.classes WHERE class_id IN (1,2,3,4,5);
+-- Expected: 5 rows
+
+-- 4. Check if professors exist for those classes
+SELECT * FROM system.professors WHERE professor_id IN (1,2,3,4,5);
+-- Expected: 5 rows
+
+-- 5. Check if subjects exist for those classes
+SELECT * FROM system.subjects WHERE subject_code IN ('IM101', 'CS202', 'IT305', 'DS401', 'AI501');
+-- Expected: 5 rows
+
+
+
+
+SELECT DISTINCT 
+  p.professor_id,
+  p.name,
+  s.subject_code,
+  s.subject_name,
+  c.class_id,
+  c.section,
+  c.school_year,
+  e.enrollment_id,
+  CASE WHEN ev.evaluation_id IS NOT NULL THEN 1 ELSE 0 END AS evaluated
+FROM system.students st
+JOIN system.enrollments e ON st.student_id = e.student_id
+JOIN system.classes c ON e.class_id = c.class_id
+JOIN system.professors p ON c.professor_id = p.professor_id
+JOIN system.subjects s ON c.subject_code = s.subject_code
+LEFT JOIN system.evaluations ev ON e.enrollment_id = ev.enrollment_id
+WHERE st.student_id = '24-1234';
+
+
+-- First, delete all existing enrollments for student '24-1234'
+DELETE FROM system.enrollments WHERE student_id = '24-1234';
+
+-- Now insert clean enrollments (one per class)
+INSERT INTO system.enrollments (student_id, class_id) VALUES ('24-1234', 1); -- IM101 with Nicky Balew
+INSERT INTO system.enrollments (student_id, class_id) VALUES ('24-1234', 2); -- CS202 with Awee Balew
+INSERT INTO system.enrollments (student_id, class_id) VALUES ('24-1234', 3); -- IT305 with Professor 1
+INSERT INTO system.enrollments (student_id, class_id) VALUES ('24-1234', 4); -- DS401 with Professor 4  
+INSERT INTO system.enrollments (student_id, class_id) VALUES ('24-1234', 5); -- AI501 with Professor 5
+
+-- Commit the changes
+COMMIT;
+
+
+-- Check what classes exist and their professor assignments
+SELECT 
+    c.class_id,
+    c.subject_code,
+    c.section,
+    c.school_year,
+    p.professor_id,
+    p.name AS professor_name
+FROM system.classes c
+JOIN system.professors p ON c.professor_id = p.professor_id
+ORDER BY c.class_id;
+
+
+-- First, check what categories you have
+-- Insert the missing categories
+INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Attitude');
+INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Appearance');
+
+-- Verify all categories
+SELECT category_id, category_name FROM system.categories WHERE form_id = 1;
+
+-- Assuming you have category_id 1 (Teaching) and 2 (Professionalism)
+-- Insert all 20 questions needed for the evaluation
+
+-- Teaching category questions (1-15)
+-- ========== TEACHING (category_id = 1) - 5 questions ==========
+INSERT INTO system.questions (category_id, question_text) VALUES (1, 'Explains concepts clearly and thoroughly.');
+INSERT INTO system.questions (category_id, question_text) VALUES (1, 'Uses effective teaching methods and engages students.');
+INSERT INTO system.questions (category_id, question_text) VALUES (1, 'Provides clear examples and real-world applications.');
+INSERT INTO system.questions (category_id, question_text) VALUES (1, 'Manages class time effectively and follows the syllabus.');
+INSERT INTO system.questions (category_id, question_text) VALUES (1, 'Is responsive to student questions and concerns.');
+
+-- ========== PROFESSIONALISM (category_id = 2) - 5 questions ==========
+INSERT INTO system.questions (category_id, question_text) VALUES (2, 'Is punctual and prepared for each class session.');
+INSERT INTO system.questions (category_id, question_text) VALUES (2, 'Treats students with respect and fairness.');
+INSERT INTO system.questions (category_id, question_text) VALUES (2, 'Returns graded work promptly.');
+INSERT INTO system.questions (category_id, question_text) VALUES (2, 'Maintains a professional demeanor at all times.');
+INSERT INTO system.questions (category_id, question_text) VALUES (2, 'Is open to feedback and suggestions from students.');
+
+-- ========== ATTITUDE (category_id = 3) - 5 questions ==========
+INSERT INTO system.questions (category_id, question_text) VALUES (3, 'Shows genuine enthusiasm for teaching the subject.');
+INSERT INTO system.questions (category_id, question_text) VALUES (3, 'Creates a positive and encouraging learning environment.');
+INSERT INTO system.questions (category_id, question_text) VALUES (3, 'Shows patience when students struggle with concepts.');
+INSERT INTO system.questions (category_id, question_text) VALUES (3, 'Demonstrates care for student success and well-being.');
+INSERT INTO system.questions (category_id, question_text) VALUES (3, 'Maintains a positive attitude even in challenging situations.');
+
+-- ========== APPEARANCE (category_id = 4) - 5 questions ==========
+INSERT INTO system.questions (category_id, question_text) VALUES (4, 'Dresses professionally and appropriately for class.');
+INSERT INTO system.questions (category_id, question_text) VALUES (4, 'Projects a confident and professional image.');
+INSERT INTO system.questions (category_id, question_text) VALUES (4, 'Observes proper grooming and personal presentation.');
+INSERT INTO system.questions (category_id, question_text) VALUES (4, 'Appearance commands respect in the classroom.');
+INSERT INTO system.questions (category_id, question_text) VALUES (4, 'Sets a good example through professional appearance.');
+
+COMMIT;
+
+-- Check questions by category
+SELECT 
+    q.question_id,
+    c.category_name,
+    q.question_text
+FROM system.questions q
+JOIN system.categories c ON q.category_id = c.category_id
+ORDER BY q.question_id;
+
+DELETE FROM system.responses;
+DELETE FROM system.evaluations;
+DELETE FROM system.remarks;
+DELETE FROM system.questions;
+COMMIT;
+
+-- Insert categories (assuming form_id = 1 exists)
+INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Teaching');
+INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Professionalism');
+INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Attitude');
+INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Appearance');
+COMMIT;
+
+
+-- ===== TEACHING (category_id = 1) - Questions 1-5 =====
+INSERT INTO system.questions (category_id, question_text) VALUES (1, 'The professor demonstrates thorough knowledge of the subject matter and explains concepts clearly.');
+INSERT INTO system.questions (category_id, question_text) VALUES (1, 'The professor uses effective teaching methods and engages students in learning.');
+INSERT INTO system.questions (category_id, question_text) VALUES (1, 'The professor provides clear explanations and examples.');
+INSERT INTO system.questions (category_id, question_text) VALUES (1, 'The professor encourages active participation in class.');
+INSERT INTO system.questions (category_id, question_text) VALUES (1, 'The professor relates the subject matter to real-world applications.');
+
+-- ===== PROFESSIONALISM (category_id = 2) - Questions 6-10 =====
+INSERT INTO system.questions (category_id, question_text) VALUES (2, 'The professor is punctual, prepared, and organized for each class session.');
+INSERT INTO system.questions (category_id, question_text) VALUES (2, 'The professor treats students with respect and fairness at all times.');
+INSERT INTO system.questions (category_id, question_text) VALUES (2, 'The professor follows the prescribed course syllabus.');
+INSERT INTO system.questions (category_id, question_text) VALUES (2, 'The professor returns graded assignments and exams promptly.');
+INSERT INTO system.questions (category_id, question_text) VALUES (2, 'The professor manages class time effectively.');
+
+-- ===== ATTITUDE (category_id = 3) - Questions 11-15 =====
+INSERT INTO system.questions (category_id, question_text) VALUES (3, 'The professor is approachable and responsive to student concerns and questions.');
+INSERT INTO system.questions (category_id, question_text) VALUES (3, 'The professor exhibits a positive and encouraging attitude toward student learning.');
+INSERT INTO system.questions (category_id, question_text) VALUES (3, 'The professor inspires students to do their best work.');
+INSERT INTO system.questions (category_id, question_text) VALUES (3, 'The professor maintains a professional demeanor at all times.');
+INSERT INTO system.questions (category_id, question_text) VALUES (3, 'The professor is open to feedback and suggestions from students.');
+
+-- ===== APPEARANCE (category_id = 4) - Questions 16-20 =====
+INSERT INTO system.questions (category_id, question_text) VALUES (4, 'The professor maintains a professional appearance appropriate for an academic setting.');
+INSERT INTO system.questions (category_id, question_text) VALUES (4, 'The professor projects a confident and professional image.');
+INSERT INTO system.questions (category_id, question_text) VALUES (4, 'The professor observes proper grooming and dress code.');
+INSERT INTO system.questions (category_id, question_text) VALUES (4, 'The professor''s appearance commands respect in the classroom.');
+INSERT INTO system.questions (category_id, question_text) VALUES (4, 'The professor sets a good example through professional posture and poise.');
+
+COMMIT;

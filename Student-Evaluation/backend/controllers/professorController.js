@@ -11,6 +11,23 @@ const getStudentProfessors = async (req, res) => {
 
     console.log("FETCHING PROFESSORS FOR:", studentNo);
 
+    // Check if student exists
+    const studentCheck = await db.execute(
+      'SELECT * FROM system.students WHERE student_id = :studentNo',
+      { studentNo },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    console.log("STUDENT EXISTS?", studentCheck.rows.length);
+
+    // Check enrollments
+    const enrollCheck = await db.execute(
+      'SELECT * FROM system.enrollments WHERE student_id = :studentNo',
+      { studentNo },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    console.log("ENROLLMENTS FOUND:", enrollCheck.rows.length);
+
+    // Main query - only current school year
     const sql = `
       SELECT DISTINCT 
         p.professor_id,
@@ -29,6 +46,8 @@ const getStudentProfessors = async (req, res) => {
       JOIN system.subjects s ON c.subject_code = s.subject_code
       LEFT JOIN system.evaluations ev ON e.enrollment_id = ev.enrollment_id
       WHERE st.student_id = :studentNo
+        AND c.school_year = '2025-2026'
+      ORDER BY e.enrollment_id
     `;
 
     const result = await db.execute(
@@ -38,6 +57,9 @@ const getStudentProfessors = async (req, res) => {
     );
 
     console.log("PROFESSORS FOUND:", result.rows.length);
+    if (result.rows.length > 0) {
+      console.log("FIRST ROW:", result.rows[0]);
+    }
 
     res.json({
       success: true,

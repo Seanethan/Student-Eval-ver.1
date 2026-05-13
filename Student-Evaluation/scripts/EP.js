@@ -41,19 +41,27 @@ async function fetchInitialData() {
         
         console.log("PROF DATA:", profData);
 
+// After line 28 (after const profData = await profResponse.json();)
+console.log("RAW PROF DATA FROM BACKEND:", JSON.stringify(profData, null, 2));
+
+
         if (profData.success && profData.professors.length > 0) {
-            professors = profData.professors.map((prof, index) => ({
-                name: prof.NAME || prof.name || '',
-                course: prof.SUBJECT_CODE || prof.subject_code || '',
-                email: prof.EMAIL || prof.email || '',
-                enrollmentId:
-                    prof.ENROLLMENT_ID ??
-                    prof.enrollment_id ??
-                    prof.enrollmentId ??
-                    prof.PROFESSOR_ID,
-                colorIndex: index % professorColors.length,
-                evaluated: prof.EVALUATED === 1 || prof.evaluated === 1
-            }));
+            professors = profData.professors.map((prof, index) => {
+    console.log("Mapping professor:", prof); // Debug log
+    
+    return {
+        name: prof.NAME || prof.name || '',
+        course: prof.SUBJECT_CODE || prof.subject_code || '',
+        email: `${prof.NAME || ''}@qcu.edu`, // Generate email from name
+        enrollmentId: prof.ENROLLMENT_ID || prof.enrollment_id, // Use UPPERCASE from Oracle
+        classId: prof.CLASS_ID,
+        subjectCode: prof.SUBJECT_CODE,
+        colorIndex: index % professorColors.length,
+        evaluated: prof.EVALUATED === 1 || prof.evaluated === 1
+    };
+});
+
+console.log("MAPPED PROFESSORS:", professors); // Debug log
             console.log("PROFESSORS AFTER MAPPING:", professors);
         } else {
             console.log("USING FALLBACK PROFESSORS");
