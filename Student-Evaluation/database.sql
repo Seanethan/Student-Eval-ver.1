@@ -111,123 +111,6 @@ CREATE TABLE Remarks (
 
 
 -- STUDENTS
-INSERT INTO Students VALUES ('24-1234', 'BSCS', 2, 'A');
-INSERT INTO Students VALUES ('24-5678', 'BSIT', 2, 'B');
-
-COMMIT;
-
--- PROFESSORS
-INSERT INTO Professors (name) VALUES ('Nicky Balew');
-INSERT INTO Professors (name) VALUES ('Awee Balew');
-
--- SUBJECTS
-INSERT INTO Subjects VALUES ('IM101', 'Information Management');
-INSERT INTO Subjects VALUES ('CS202', 'Computer Science 202');
-
--- CLASSES
-INSERT INTO Classes (subject_code, professor_id, section, school_year)
-VALUES ('IM101', 1, 'BSCS-2A', '2025-2026');
-
-INSERT INTO Classes (subject_code, professor_id, section, school_year)
-VALUES ('CS202', 2, 'BSIT-2B', '2025-2026');
-
--- ENROLLMENTS
-INSERT INTO Enrollments (student_id, class_id) VALUES ('24-1234', 1);
-INSERT INTO Enrollments (student_id, class_id) VALUES ('24-1234', 2);
-
--- FORM
-INSERT INTO Forms (form_name) VALUES ('Student Evaluation Form');
-
--- CATEGORIES
-INSERT INTO Categories (form_id, category_name) VALUES (1, 'Teaching');
-INSERT INTO Categories (form_id, category_name) VALUES (1, 'Professionalism');
-
--- QUESTIONS
-INSERT INTO Questions (category_id, question_text)
-VALUES (1, 'Explains concepts clearly');
-
-INSERT INTO Questions (category_id, question_text)
-VALUES (2, 'Is punctual and organized');
-
--- EVALUATION
-INSERT INTO Evaluations (enrollment_id) VALUES (1);
-
--- RESPONSES
-INSERT INTO Responses (evaluation_id, question_id, rating)
-VALUES (1, 1, 5);
-
-INSERT INTO Responses (evaluation_id, question_id, rating)
-VALUES (1, 2, 4);
-
-
-
-/* assessment 
-admin visible information
-
-
- */
-
-SELECT 
-    p.name AS professor,
-    s.subject_code,
-    e.date_submitted,
-    r.remarks_text
-FROM system.evaluations e
-JOIN system.enrollments en ON e.enrollment_id = en.enrollment_id
-JOIN system.classes c ON en.class_id = c.class_id
-JOIN system.professors p ON c.professor_id = p.professor_id
-JOIN system.subjects s ON c.subject_code = s.subject_code
-LEFT JOIN system.remarks r ON r.evaluation_id = e.evaluation_id;
-
-
-SELECT 
-    p.name,
-    ROUND(AVG(r.rating), 2) AS avg_rating
-FROM Professors p
-JOIN Classes c ON p.professor_id = c.professor_id
-JOIN Enrollments e ON c.class_id = e.class_id
-JOIN Evaluations ev ON e.enrollment_id = ev.enrollment_id
-JOIN Responses r ON ev.evaluation_id = r.evaluation_id
-WHERE r.rating IS NOT NULL
-GROUP BY p.name;
-
-SELECT * FROM system.Students;
-
-SELECT * FROm system.Remarks;
-
-SELECT * FROM system.Professors;
-
-SELECT * FROM system.Evaluations;
-
-SELECT * FROM system.Forms;
-
-SELECT * FROM system.categories;
-SELECT * FROM system.Questions;
-
-SELECT * FROM system.Subjects;
-SELECT * FROM system.Classes;
-
-SELECT * FROM system.responses;
-
-SELECT table_name FROM user_tables;
-
-
-
-
-INSERT INTO Professors (name) VALUES ('Proffesor 1');
-INSERT INTO Professors (name) VALUES ('Proffesor 2');
-INSERT INTO Professors (name) VALUES ('Proffesor 3');
-INSERT INTO Professors (name) VALUES ('Professor 4');
-INSERT INTO Professors (name) VALUES ('Professor 5');
-
-
-INSERT INTO Subjects (subject_code, subject_name) VALUES ('IM101', 'Information Management');
-INSERT INTO Subjects (subject_code, subject_name) VALUES ('CS202', 'Computer Science 202');
-INSERT INTO Subjects (subject_code, subject_name) VALUES ('IT305', 'Information Technology 305');
-INSERT INTO Subjects (subject_code, subject_name) VALUES ('DS401', 'Data Science 401');
-INSERT INTO Subjects (subject_code, subject_name) VALUES ('AI501', 'Artificial Intelligence 501');
-
-
 INSERT INTO Students (student_id, course_code, year_level, section)
 VALUES ('24-1234', 'BSCS', 2, 'A');
 
@@ -235,6 +118,23 @@ INSERT INTO Students (student_id, course_code, year_level, section)
 VALUES ('24-5678', 'BSIT', 2, 'B');
 
 
+COMMIT;
+
+-- PROFESSORS
+INSERT INTO Professors (name) VALUES ('Proffesor 1');
+INSERT INTO Professors (name) VALUES ('Proffesor 2');
+INSERT INTO Professors (name) VALUES ('Proffesor 3');
+INSERT INTO Professors (name) VALUES ('Professor 4');
+INSERT INTO Professors (name) VALUES ('Professor 5');
+
+-- SUBJECTS
+INSERT INTO Subjects (subject_code, subject_name) VALUES ('IM101', 'Information Management');
+INSERT INTO Subjects (subject_code, subject_name) VALUES ('CS202', 'Computer Science 202');
+INSERT INTO Subjects (subject_code, subject_name) VALUES ('IT305', 'Information Technology 305');
+INSERT INTO Subjects (subject_code, subject_name) VALUES ('DS401', 'Data Science 401');
+INSERT INTO Subjects (subject_code, subject_name) VALUES ('AI501', 'Artificial Intelligence 501');
+
+-- CLASSES
 INSERT INTO Classes (subject_code, professor_id, section, school_year)
 VALUES ('IM101', 1, 'A', '2024-2025');
 
@@ -250,185 +150,23 @@ VALUES ('DS401', 4, 'A', '2024-2025');
 INSERT INTO Classes (subject_code, professor_id, section, school_year)
 VALUES ('AI501', 5, 'A', '2024-2025');
 
-
+-- ENROLLMENTS
 INSERT INTO Enrollments (student_id, class_id) VALUES ('24-1234', 1);
 INSERT INTO Enrollments (student_id, class_id) VALUES ('24-1234', 2);
 INSERT INTO Enrollments (student_id, class_id) VALUES ('24-1234', 3);
 INSERT INTO Enrollments (student_id, class_id) VALUES ('24-1234', 4);
 INSERT INTO Enrollments (student_id, class_id) VALUES ('24-1234', 5);
 
+-- FORM
+INSERT INTO Forms (form_name) VALUES ('Student Evaluation Form');
 
-
-
-SELECT * FROM system.Students;
-
-SELECT *
-FROM system.remarks
-ORDER BY evaluation_id DESC;
-
-SELECT * from system.Professors;
-
-SELECT evaluation_id, remarks_text
-FROM system.remarks
-ORDER BY evaluation_id DESC;
-
-
-DROP TABLE system.Evaluations CASCADE CONSTRAINTS;
-DROP TABLE system.Professors CASCADE CONSTRAINTS;
-DROP TABLE system.Subjects CASCADE CONSTRAINTS;
-DROP TABLE system.Students CASCADE CONSTRAINTS;
-DROP TABLE system.Classes CASCADE CONSTRAINTS;
-DROP TABLE system.Enrollments CASCADE CONSTRAINTS;
-DROP TABLE system.Forms CASCADE CONSTRAINTS;
-DROP TABLE system.Categories CASCADE CONSTRAINTS;
-DROP TABLE system.Questions CASCADE CONSTRAINTS;
-DROP TABLE system.Responses CASCADE CONSTRAINTS;
-DROP TABLE system.Remarks CASCADE CONSTRAINTS;
-
-*/
-SELECT * FROM enrollments WHERE enrollment_id = 24-1234;
-
-SELECT * FROM Enrollments;
-
-SELECT enrollment_id, student_id, class_id 
-FROM Enrollments 
-WHERE student_id = '24-1234';
-
--- 1. Check if student exists
-SELECT * FROM system.students WHERE student_id = '24-1234';
--- Expected: 1 row
-
--- 2. Check enrollments for this student
-SELECT * FROM system.enrollments WHERE student_id = '24-1234';
--- Expected: 5 rows (class_id 1-5)
-
--- 3. Check if classes exist for those enrollments
-SELECT * FROM system.classes WHERE class_id IN (1,2,3,4,5);
--- Expected: 5 rows
-
--- 4. Check if professors exist for those classes
-SELECT * FROM system.professors WHERE professor_id IN (1,2,3,4,5);
--- Expected: 5 rows
-
--- 5. Check if subjects exist for those classes
-SELECT * FROM system.subjects WHERE subject_code IN ('IM101', 'CS202', 'IT305', 'DS401', 'AI501');
--- Expected: 5 rows
-
-
-
-
-SELECT DISTINCT 
-  p.professor_id,
-  p.name,
-  s.subject_code,
-  s.subject_name,
-  c.class_id,
-  c.section,
-  c.school_year,
-  e.enrollment_id,
-  CASE WHEN ev.evaluation_id IS NOT NULL THEN 1 ELSE 0 END AS evaluated
-FROM system.students st
-JOIN system.enrollments e ON st.student_id = e.student_id
-JOIN system.classes c ON e.class_id = c.class_id
-JOIN system.professors p ON c.professor_id = p.professor_id
-JOIN system.subjects s ON c.subject_code = s.subject_code
-LEFT JOIN system.evaluations ev ON e.enrollment_id = ev.enrollment_id
-WHERE st.student_id = '24-1234';
-
-
--- First, delete all existing enrollments for student '24-1234'
-DELETE FROM system.enrollments WHERE student_id = '24-1234';
-
--- Now insert clean enrollments (one per class)
-INSERT INTO system.enrollments (student_id, class_id) VALUES ('24-1234', 1); -- IM101 with Nicky Balew
-INSERT INTO system.enrollments (student_id, class_id) VALUES ('24-1234', 2); -- CS202 with Awee Balew
-INSERT INTO system.enrollments (student_id, class_id) VALUES ('24-1234', 3); -- IT305 with Professor 1
-INSERT INTO system.enrollments (student_id, class_id) VALUES ('24-1234', 4); -- DS401 with Professor 4  
-INSERT INTO system.enrollments (student_id, class_id) VALUES ('24-1234', 5); -- AI501 with Professor 5
-
--- Commit the changes
-COMMIT;
-
-
--- Check what classes exist and their professor assignments
-SELECT 
-    c.class_id,
-    c.subject_code,
-    c.section,
-    c.school_year,
-    p.professor_id,
-    p.name AS professor_name
-FROM system.classes c
-JOIN system.professors p ON c.professor_id = p.professor_id
-ORDER BY c.class_id;
-
-
--- First, check what categories you have
--- Insert the missing categories
-INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Attitude');
-INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Appearance');
-
--- Verify all categories
-SELECT category_id, category_name FROM system.categories WHERE form_id = 1;
-
--- Assuming you have category_id 1 (Teaching) and 2 (Professionalism)
--- Insert all 20 questions needed for the evaluation
-
--- Teaching category questions (1-15)
--- ========== TEACHING (category_id = 1) - 5 questions ==========
-INSERT INTO system.questions (category_id, question_text) VALUES (1, 'Explains concepts clearly and thoroughly.');
-INSERT INTO system.questions (category_id, question_text) VALUES (1, 'Uses effective teaching methods and engages students.');
-INSERT INTO system.questions (category_id, question_text) VALUES (1, 'Provides clear examples and real-world applications.');
-INSERT INTO system.questions (category_id, question_text) VALUES (1, 'Manages class time effectively and follows the syllabus.');
-INSERT INTO system.questions (category_id, question_text) VALUES (1, 'Is responsive to student questions and concerns.');
-
--- ========== PROFESSIONALISM (category_id = 2) - 5 questions ==========
-INSERT INTO system.questions (category_id, question_text) VALUES (2, 'Is punctual and prepared for each class session.');
-INSERT INTO system.questions (category_id, question_text) VALUES (2, 'Treats students with respect and fairness.');
-INSERT INTO system.questions (category_id, question_text) VALUES (2, 'Returns graded work promptly.');
-INSERT INTO system.questions (category_id, question_text) VALUES (2, 'Maintains a professional demeanor at all times.');
-INSERT INTO system.questions (category_id, question_text) VALUES (2, 'Is open to feedback and suggestions from students.');
-
--- ========== ATTITUDE (category_id = 3) - 5 questions ==========
-INSERT INTO system.questions (category_id, question_text) VALUES (3, 'Shows genuine enthusiasm for teaching the subject.');
-INSERT INTO system.questions (category_id, question_text) VALUES (3, 'Creates a positive and encouraging learning environment.');
-INSERT INTO system.questions (category_id, question_text) VALUES (3, 'Shows patience when students struggle with concepts.');
-INSERT INTO system.questions (category_id, question_text) VALUES (3, 'Demonstrates care for student success and well-being.');
-INSERT INTO system.questions (category_id, question_text) VALUES (3, 'Maintains a positive attitude even in challenging situations.');
-
--- ========== APPEARANCE (category_id = 4) - 5 questions ==========
-INSERT INTO system.questions (category_id, question_text) VALUES (4, 'Dresses professionally and appropriately for class.');
-INSERT INTO system.questions (category_id, question_text) VALUES (4, 'Projects a confident and professional image.');
-INSERT INTO system.questions (category_id, question_text) VALUES (4, 'Observes proper grooming and personal presentation.');
-INSERT INTO system.questions (category_id, question_text) VALUES (4, 'Appearance commands respect in the classroom.');
-INSERT INTO system.questions (category_id, question_text) VALUES (4, 'Sets a good example through professional appearance.');
-
-COMMIT;
-
--- Check questions by category
-SELECT 
-    q.question_id,
-    c.category_name,
-    q.question_text
-FROM system.questions q
-JOIN system.categories c ON q.category_id = c.category_id
-ORDER BY q.question_id;
-
-DELETE FROM system.responses;
-DELETE FROM system.evaluations;
-DELETE FROM system.remarks;
-DELETE FROM system.questions;
-COMMIT;
-
--- Insert categories (assuming form_id = 1 exists)
+-- CATEGORIES
 INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Teaching');
 INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Professionalism');
 INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Attitude');
 INSERT INTO system.categories (form_id, category_name) VALUES (1, 'Appearance');
-COMMIT;
 
-
--- ===== TEACHING (category_id = 1) - Questions 1-5 =====
+-- QUESTIONS
 INSERT INTO system.questions (category_id, question_text) VALUES (1, 'The professor demonstrates thorough knowledge of the subject matter and explains concepts clearly.');
 INSERT INTO system.questions (category_id, question_text) VALUES (1, 'The professor uses effective teaching methods and engages students in learning.');
 INSERT INTO system.questions (category_id, question_text) VALUES (1, 'The professor provides clear explanations and examples.');
@@ -456,4 +194,139 @@ INSERT INTO system.questions (category_id, question_text) VALUES (4, 'The profes
 INSERT INTO system.questions (category_id, question_text) VALUES (4, 'The professor''s appearance commands respect in the classroom.');
 INSERT INTO system.questions (category_id, question_text) VALUES (4, 'The professor sets a good example through professional posture and poise.');
 
+COMMIT;
+
+
+
+-- RESPONSES
+INSERT INTO Responses (evaluation_id, question_id, rating)
+VALUES (1, 1, 5);
+
+INSERT INTO Responses (evaluation_id, question_id, rating)
+VALUES (1, 2, 4);
+
+
+
+/* assessment 
+admin visible information
+ */
+
+SELECT 
+    p.name AS professor,
+    s.subject_code,
+    e.date_submitted,
+    r.remarks_text
+FROM system.evaluations e
+JOIN system.enrollments en ON e.enrollment_id = en.enrollment_id
+JOIN system.classes c ON en.class_id = c.class_id
+JOIN system.professors p ON c.professor_id = p.professor_id
+JOIN system.subjects s ON c.subject_code = s.subject_code
+LEFT JOIN system.remarks r ON r.evaluation_id = e.evaluation_id;
+
+
+SELECT 
+    p.name,
+    ROUND(AVG(r.rating), 2) AS avg_rating
+FROM Professors p
+JOIN Classes c ON p.professor_id = c.professor_id
+JOIN Enrollments e ON c.class_id = e.class_id
+JOIN Evaluations ev ON e.enrollment_id = ev.enrollment_id
+JOIN Responses r ON ev.evaluation_id = r.evaluation_id
+WHERE r.rating IS NOT NULL
+GROUP BY p.name;
+
+SELECT * FROM system.Students;
+SELECT * FROm system.Remarks;
+SELECT * FROM system.Professors;
+SELECT * FROM system.Evaluations;
+SELECT * FROM system.Forms;
+SELECT * FROM system.categories;
+SELECT * FROM system.Questions;
+SELECT * FROM system.Subjects;
+SELECT * FROM system.Classes;
+SELECT * FROM system.responses;
+SELECT table_name FROM user_tables;
+
+
+SELECT * FROM system.Students;
+
+SELECT *
+FROM system.remarks
+ORDER BY evaluation_id DESC;
+
+SELECT * from system.Professors;
+
+SELECT evaluation_id, remarks_text
+FROM system.remarks
+ORDER BY evaluation_id DESC;
+
+
+DROP TABLE system.Evaluations CASCADE CONSTRAINTS;
+DROP TABLE system.Professors CASCADE CONSTRAINTS;
+DROP TABLE system.Subjects CASCADE CONSTRAINTS;
+DROP TABLE system.Students CASCADE CONSTRAINTS;
+DROP TABLE system.Classes CASCADE CONSTRAINTS;
+DROP TABLE system.Enrollments CASCADE CONSTRAINTS;
+DROP TABLE system.Forms CASCADE CONSTRAINTS;
+DROP TABLE system.Categories CASCADE CONSTRAINTS;
+DROP TABLE system.Questions CASCADE CONSTRAINTS;
+DROP TABLE system.Responses CASCADE CONSTRAINTS;
+DROP TABLE system.Remarks CASCADE CONSTRAINTS;
+
+SELECT * FROM enrollments WHERE enrollment_id = 24-1234;
+
+SELECT * FROM Enrollments;
+
+SELECT enrollment_id, student_id, class_id 
+FROM Enrollments 
+WHERE student_id = '24-1234';
+
+SELECT DISTINCT 
+  p.professor_id,
+  p.name,
+  s.subject_code,
+  s.subject_name,
+  c.class_id,
+  c.section,
+  c.school_year,
+  e.enrollment_id,
+  CASE WHEN ev.evaluation_id IS NOT NULL THEN 1 ELSE 0 END AS evaluated
+FROM system.students st
+JOIN system.enrollments e ON st.student_id = e.student_id
+JOIN system.classes c ON e.class_id = c.class_id
+JOIN system.professors p ON c.professor_id = p.professor_id
+JOIN system.subjects s ON c.subject_code = s.subject_code
+LEFT JOIN system.evaluations ev ON e.enrollment_id = ev.enrollment_id
+WHERE st.student_id = '24-1234';
+
+-- Check what classes exist and their professor assignments
+SELECT 
+    c.class_id,
+    c.subject_code,
+    c.section,
+    c.school_year,
+    p.professor_id,
+    p.name AS professor_name
+FROM system.classes c
+JOIN system.professors p ON c.professor_id = p.professor_id
+ORDER BY c.class_id;
+
+
+--check Categories
+SELECT category_id, category_name FROM system.categories WHERE form_id = 1;
+
+
+-- Check questions by category
+SELECT 
+    q.question_id,
+    c.category_name,
+    q.question_text
+FROM system.questions q
+JOIN system.categories c ON q.category_id = c.category_id
+ORDER BY q.question_id;
+
+DELETE FROM system.responses;
+DELETE FROM system.evaluations;
+DELETE FROM system.remarks;
+DELETE FROM system.questions;
 COMMIT;

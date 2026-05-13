@@ -3,7 +3,7 @@ require('dotenv').config();
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
-// ⚠️ Turn OFF global autoCommit (important for transactions)
+// Turn OFF global autoCommit (important for transactions)
 oracledb.autoCommit = false;
 
 const dbConfig = {
