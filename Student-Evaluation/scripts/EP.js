@@ -107,9 +107,9 @@ console.log("MAPPED PROFESSORS:", professors); // Debug log
 
 function getFallbackProfessors() {
     return [
-        { name: "Nicky Balew", course: "IM101", email: "nickybalew@gmail.com", enrollmentId: 1, colorIndex: 0, evaluated: false },
-        { name: "Awee Balew", course: "CS 202", email: "awee.balew@qcu.edu", enrollmentId: 2, colorIndex: 1, evaluated: false },
-        { name: "Redenton Balew", course: "IT 305", email: "redenton@qcu.edu", enrollmentId: 3, colorIndex: 2, evaluated: false },
+        { name: "Professor 1", course: "IM101", email: "prof1@qcu.edu", enrollmentId: 1, colorIndex: 0, evaluated: false },
+        { name: "Professor 2", course: "CS 202", email: "prof2@qcu.edu", enrollmentId: 2, colorIndex: 1, evaluated: false },
+        { name: "Professor 3", course: "IT 305", email: "prof3@qcu.edu", enrollmentId: 3, colorIndex: 2, evaluated: false },
         { name: "Professor 4", course: "DS 401", email: "prof4@qcu.edu", enrollmentId: 4, colorIndex: 3, evaluated: false },
         { name: "Professor 5", course: "AI 501", email: "prof5@qcu.edu", enrollmentId: 5, colorIndex: 4, evaluated: false }
     ];
