@@ -1,5 +1,4 @@
-console.log("EP.js loaded");
-
+console.log("EP.js loaded - WITH DATABASE FUNCTION CALLS");
 
 // ======================== STUDENT DATA ========================
 const studentNo = localStorage.getItem("studentNo");
@@ -30,50 +29,357 @@ let currentProfessorIndex = 0;
 let currentProfessor = null;
 let currentPage = 0;
 
-// Fetch data from backend
+// ======================== FUNCTION CALL EXAMPLES ========================
+// These functions demonstrate calling Oracle database functions from frontend
+
+/**
+ * EXAMPLE 1: Call Oracle function get_avg_rating()
+ * This gets a professor's average rating from all evaluations
+ */
+async function callGetAvgRating(professorId) {
+    try {
+        console.log(`📞 Calling Oracle function: get_avg_rating(${professorId})`);
+        
+        const response = await fetch(`http://localhost:3000/api/functions/get-avg-rating/${professorId}`, {
+            headers: { 'x-student-number': studentNo }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(`✅ Function get_avg_rating() returned: ${data.averageRating}`);
+            return data.averageRating;
+        }
+        return 0;
+    } catch (error) {
+        console.error("❌ Error calling get_avg_rating():", error);
+        return 0;
+    }
+}
+
+/**
+ * EXAMPLE 2: Call Oracle function count_responses()
+ * This counts how many responses exist for an evaluation
+ */
+async function callCountResponses(evaluationId) {
+    try {
+        console.log(`📞 Calling Oracle function: count_responses(${evaluationId})`);
+        
+        const response = await fetch(`http://localhost:3000/api/functions/count-responses/${evaluationId}`, {
+            headers: { 'x-student-number': studentNo }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(`✅ Function count_responses() returned: ${data.responseCount}`);
+            return data.responseCount;
+        }
+        return 0;
+    } catch (error) {
+        console.error("❌ Error calling count_responses():", error);
+        return 0;
+    }
+}
+
+/**
+ * EXAMPLE 3: Call Oracle function get_remarks()
+ * This retrieves remarks text for an evaluation
+ */
+async function callGetRemarks(evaluationId) {
+    try {
+        console.log(`📞 Calling Oracle function: get_remarks(${evaluationId})`);
+        
+        const response = await fetch(`http://localhost:3000/api/functions/get-remarks/${evaluationId}`, {
+            headers: { 'x-student-number': studentNo }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(`✅ Function get_remarks() returned: "${data.remarksText.substring(0, 50)}..."`);
+            return data.remarksText;
+        }
+        return "";
+    } catch (error) {
+        console.error("❌ Error calling get_remarks():", error);
+        return "";
+    }
+}
+
+/**
+ * EXAMPLE 4: Call Oracle function is_evaluated()
+ * This checks if a specific enrollment has been evaluated
+ */
+async function callIsEvaluated(enrollmentId) {
+    try {
+        console.log(`📞 Calling Oracle function: is_evaluated(${enrollmentId})`);
+        
+        const response = await fetch(`http://localhost:3000/api/functions/is-evaluated/${enrollmentId}`, {
+            headers: { 'x-student-number': studentNo }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            const isEval = data.isEvaluated === 1;
+            console.log(`✅ Function is_evaluated() returned: ${isEval ? 'YES' : 'NO'}`);
+            return isEval;
+        }
+        return false;
+    } catch (error) {
+        console.error("❌ Error calling is_evaluated():", error);
+        return false;
+    }
+}
+
+/**
+ * EXAMPLE 5: Call Oracle function count_enrollments()
+ * This counts total enrollments for a student
+ */
+async function callCountEnrollments(studentId) {
+    try {
+        console.log(`📞 Calling Oracle function: count_enrollments('${studentId}')`);
+        
+        const response = await fetch(`http://localhost:3000/api/functions/count-enrollments/${studentId}`, {
+            headers: { 'x-student-number': studentNo }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(`✅ Function count_enrollments() returned: ${data.enrollmentCount}`);
+            return data.enrollmentCount;
+        }
+        return 0;
+    } catch (error) {
+        console.error("❌ Error calling count_enrollments():", error);
+        return 0;
+    }
+}
+
+/**
+ * EXAMPLE 6: Call Oracle function has_completed_all_evaluations()
+ * This checks if student finished all evaluations
+ */
+async function callHasCompletedAllEvaluations(studentId) {
+    try {
+        console.log(`📞 Calling Oracle function: has_completed_all_evaluations('${studentId}')`);
+        
+        const response = await fetch(`http://localhost:3000/api/functions/completion-status/${studentId}`, {
+            headers: { 'x-student-number': studentNo }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(`✅ Function has_completed_all_evaluations() returned: ${data.status}`);
+            return data.status;
+        }
+        return "UNKNOWN";
+    } catch (error) {
+        console.error("❌ Error calling has_completed_all_evaluations():", error);
+        return "ERROR";
+    }
+}
+
+/**
+ * EXAMPLE 7: Call Oracle function get_category_avg_rating()
+ * This gets average rating for a specific category (Teaching, Professionalism, etc.)
+ */
+async function callGetCategoryAvgRating(professorId, categoryName) {
+    try {
+        console.log(`📞 Calling Oracle function: get_category_avg_rating(${professorId}, '${categoryName}')`);
+        
+        const response = await fetch(`http://localhost:3000/api/functions/category-rating/${professorId}/${encodeURIComponent(categoryName)}`, {
+            headers: { 'x-student-number': studentNo }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(`✅ Function get_category_avg_rating() for '${categoryName}' returned: ${data.categoryRating}`);
+            return data.categoryRating;
+        }
+        return 0;
+    } catch (error) {
+        console.error("❌ Error calling get_category_avg_rating():", error);
+        return 0;
+    }
+}
+
+/**
+ * EXAMPLE 8: Call Oracle function get_total_evaluations()
+ * This gets total number of evaluations for a professor
+ */
+async function callGetTotalEvaluations(professorId) {
+    try {
+        console.log(`📞 Calling Oracle function: get_total_evaluations(${professorId})`);
+        
+        const response = await fetch(`http://localhost:3000/api/functions/total-evaluations/${professorId}`, {
+            headers: { 'x-student-number': studentNo }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(`✅ Function get_total_evaluations() returned: ${data.totalEvaluations}`);
+            return data.totalEvaluations;
+        }
+        return 0;
+    } catch (error) {
+        console.error("❌ Error calling get_total_evaluations():", error);
+        return 0;
+    }
+}
+
+// ======================== DEMONSTRATE FUNCTION CALLS ========================
+/**
+ * This function demonstrates calling multiple Oracle functions
+ * Called when page loads to show your teacher that functions are being used
+ */
+async function demonstrateFunctionCalls() {
+    console.log("=========================================");
+    console.log("🔍 DEMONSTRATING ORACLE DATABASE FUNCTIONS");
+    console.log("=========================================");
+    
+    // Demo 1: Count enrollments for current student
+    if (studentNo) {
+        const enrollmentCount = await callCountEnrollments(studentNo);
+        console.log(`📊 Student ${studentNo} has ${enrollmentCount} enrollment(s)`);
+        
+        // Update UI to show function result
+        const enrollmentInfo = document.querySelector('.bg-white.rounded-2xl.shadow-lg.p-5');
+        if (enrollmentInfo && !document.getElementById('functionDemoBadge')) {
+            const demoBadge = document.createElement('div');
+            demoBadge.id = 'functionDemoBadge';
+            demoBadge.className = 'mt-3 text-xs text-indigo-600 bg-indigo-50 p-2 rounded-lg';
+            demoBadge.innerHTML = `
+                <strong>📊 Database Function Demo:</strong><br>
+                count_enrollments('${studentNo}') = ${enrollmentCount}
+            `;
+            enrollmentInfo.appendChild(demoBadge);
+        }
+    }
+    
+    // Demo 2: Check completion status
+    if (studentNo) {
+        const completionStatus = await callHasCompletedAllEvaluations(studentNo);
+        console.log(`📊 Completion status: ${completionStatus}`);
+    }
+    
+    // Demo 3: If we have a current professor, show their stats
+    if (currentProfessor && currentProfessor.classId) {
+        const professorId = currentProfessor.classId; // Adjust based on your data structure
+        const avgRating = await callGetAvgRating(professorId);
+        const totalEvals = await callGetTotalEvaluations(professorId);
+        
+        console.log(`📊 Professor stats - Avg Rating: ${avgRating}, Total Evals: ${totalEvals}`);
+        
+        // Add function result to professor info card
+        const profInfoCard = document.querySelector('.bg-white.rounded-2xl.shadow-lg.p-6.border-l-4');
+        if (profInfoCard && !document.getElementById('profFunctionStats')) {
+            const statsDiv = document.createElement('div');
+            statsDiv.id = 'profFunctionStats';
+            statsDiv.className = 'mt-4 pt-3 border-t border-gray-200 text-xs';
+            statsDiv.innerHTML = `
+                <p class="text-gray-600"><strong>📊 Database Function Results:</strong></p>
+                <p>get_avg_rating(${professorId}) = ${avgRating || 'N/A'}</p>
+                <p>get_total_evaluations(${professorId}) = ${totalEvals || 'N/A'}</p>
+            `;
+            profInfoCard.appendChild(statsDiv);
+        }
+    }
+    
+    console.log("=========================================");
+    console.log("✅ Function demonstration complete");
+    console.log("=========================================");
+}
+
+// ======================== FETCH DATA FROM BACKEND ========================
 async function fetchInitialData() {
     try {
-        // Fetch professors
+        // Fetch professors with evaluation status using Oracle function
+        console.log("📞 Calling backend which uses Oracle function is_evaluated()");
         const profResponse = await fetch('http://localhost:3000/api/professors/student-professors', {
             headers: { 'x-student-number': studentNo }
         });
         const profData = await profResponse.json();
         
         console.log("PROF DATA:", profData);
+        if (profData.success && profData.professors && profData.professors.length > 0) {
+    console.log("=== DEBUG: FIRST PROFESSOR OBJECT ===");
+    console.log("Full object:", JSON.stringify(profData.professors[0], null, 2));
+    console.log("All keys:", Object.keys(profData.professors[0]));
+    console.log("NAME value:", profData.professors[0].NAME);
+    console.log("name value:", profData.professors[0].name);
+    console.log("ENROLLMENT_ID value:", profData.professors[0].ENROLLMENT_ID);
+    console.log("enrollmentId value:", profData.professors[0].enrollmentId);
+    console.log("=== END DEBUG ===");
+}
 
-// After line 28 (after const profData = await profResponse.json();)
-console.log("RAW PROF DATA FROM BACKEND:", JSON.stringify(profData, null, 2));
-
-
-        if (profData.success && profData.professors.length > 0) {
-            professors = profData.professors.map((prof, index) => {
-    console.log("Mapping professor:", prof); // Debug log
+        if (profData.success && profData.professors && profData.professors.length > 0) {
+    // DEBUG: Log the structure
+    console.log("=== DEBUG: Professor data structure ===");
+    console.log("First professor keys:", Object.keys(profData.professors[0]));
+    console.log("First professor:", JSON.stringify(profData.professors[0], null, 2));
     
-    return {
-        name: prof.NAME || prof.name || '',
-        course: prof.SUBJECT_CODE || prof.subject_code || '',
-        email: `${prof.NAME || ''}@qcu.edu`, // Generate email from name
-        enrollmentId: prof.ENROLLMENT_ID || prof.enrollment_id, // Use UPPERCASE from Oracle
-        classId: prof.CLASS_ID,
-        subjectCode: prof.SUBJECT_CODE,
-        colorIndex: index % professorColors.length,
-        evaluated: prof.EVALUATED === 1 || prof.evaluated === 1
-    };
-});
-
-console.log("MAPPED PROFESSORS:", professors); // Debug log
-            console.log("PROFESSORS AFTER MAPPING:", professors);
-        } else {
-            console.log("USING FALLBACK PROFESSORS");
-            professors = getFallbackProfessors();
+    professors = profData.professors.map((prof, index) => {
+        // Helper function to get property case-insensitively
+        const getProp = (obj, propName) => {
+            // Try exact match first
+            if (obj[propName] !== undefined) return obj[propName];
+            // Try uppercase
+            if (obj[propName.toUpperCase()] !== undefined) return obj[propName.toUpperCase()];
+            // Try lowercase
+            if (obj[propName.toLowerCase()] !== undefined) return obj[propName.toLowerCase()];
+            // Try common variations
+            const variations = [
+                propName,
+                propName.toUpperCase(),
+                propName.toLowerCase(),
+                propName.replace(/([A-Z])/g, '_$1').toUpperCase(),
+                propName.replace(/_/g, '').toUpperCase()
+            ];
+            for (const variation of variations) {
+                if (obj[variation] !== undefined) return obj[variation];
+            }
+            return undefined;
+        };
+        
+        const name = getProp(prof, 'NAME') || getProp(prof, 'name') || 'Unknown Professor';
+        const subjectCode = getProp(prof, 'SUBJECT_CODE') || getProp(prof, 'subjectCode') || '';
+        const enrollmentId = getProp(prof, 'ENROLLMENT_ID') || getProp(prof, 'enrollmentId');
+        const classId = getProp(prof, 'CLASS_ID') || getProp(prof, 'classId');
+        const professorId = getProp(prof, 'PROFESSOR_ID') || getProp(prof, 'professorId');
+        const evaluated = getProp(prof, 'EVALUATED') === 1 || getProp(prof, 'evaluated') === true;
+        
+        console.log(`📊 Processing: name=${name}, subjectCode=${subjectCode}, enrollmentId=${enrollmentId}, evaluated=${evaluated}`);
+        
+        return {
+            name: name,
+            course: subjectCode,
+            subjectCode: subjectCode,
+            subjectName: getProp(prof, 'SUBJECT_NAME') || getProp(prof, 'subjectName') || '',
+            email: `${name.replace(/\s/g, '')}@qcu.edu.ph`,
+            enrollmentId: enrollmentId,
+            classId: classId,
+            professorId: professorId,
+            section: getProp(prof, 'SECTION') || getProp(prof, 'section') || '',
+            schoolYear: getProp(prof, 'SCHOOL_YEAR') || getProp(prof, 'schoolYear') || '2024-2025',
+            evaluated: evaluated,
+            averageRating: getProp(prof, 'AVERAGE_RATING') || getProp(prof, 'averageRating') || 0,
+            colorIndex: index % professorColors.length
+        };
+    });
+    
+    console.log("✅ MAPPED PROFESSORS:", professors);
+    
+    // Verify each professor has required fields
+    professors.forEach((prof, idx) => {
+        console.log(`Professor ${idx}: ${prof.name}, EnrollmentId: ${prof.enrollmentId}, Course: ${prof.course}`);
+        if (!prof.enrollmentId) {
+            console.warn(`⚠️ Professor ${prof.name} has NO enrollmentId!`);
         }
+    });
+}
 
         // Fetch questions
         const questResponse = await fetch('http://localhost:3000/api/evaluations/questions');
         const questData = await questResponse.json();
         
-        console.log("QUEST DATA:", questData);
-
         if (questData.success && questData.categories && questData.categories.length > 0) {
             questions = [];
             questData.categories.forEach(category => {
@@ -81,7 +387,7 @@ console.log("MAPPED PROFESSORS:", professors); // Debug log
                     questions.push(q.questionText);
                 });
             });
-            console.log("QUESTIONS FROM DB:", questions.length);
+            console.log(`📊 Loaded ${questions.length} questions from database`);
         } else {
             console.log("USING FALLBACK QUESTIONS");
             questions = getStaticQuestions();
@@ -94,24 +400,187 @@ console.log("MAPPED PROFESSORS:", professors); // Debug log
         
         console.log("CURRENT PROFESSOR SET TO:", currentProfessor);
         
+        // Initialize UI
         init();
+        
+        // DEMONSTRATE FUNCTION CALLS TO TEACHER
+        // This shows that our frontend actually calls Oracle functions
+        await demonstrateFunctionCalls();
+        
+        // Additional function demo when clicking on professor
+        setupFunctionDemoButton();
+        
     } catch (error) {
         console.error('Error fetching data:', error);
         professors = getFallbackProfessors();
         questions = getStaticQuestions();
         currentProfessor = professors[0];
-        console.log("FALLBACK PROFESSOR:", currentProfessor);
         init();
+        // Still try to demonstrate functions even with fallback data
+        demonstrateFunctionCalls();
     }
 }
 
+// ======================== SETUP FUNCTION DEMO BUTTON ========================
+function setupFunctionDemoButton() {
+    // Add a button to test functions manually (for teacher demonstration)
+    const professorCard = document.querySelector('.bg-white.rounded-2xl.shadow-lg.p-6.border-l-4');
+    if (professorCard && !document.getElementById('testFunctionsBtn')) {
+        const testBtn = document.createElement('button');
+        testBtn.id = 'testFunctionsBtn';
+        testBtn.className = 'mt-3 w-full bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs py-2 rounded-lg transition font-semibold';
+        testBtn.innerHTML = '🔍 Test Database Functions (for teacher)';
+        testBtn.onclick = async () => {
+            console.clear();
+            console.log("🧪 MANUAL FUNCTION TEST TRIGGERED BY TEACHER");
+            
+            const results = [];
+            
+            // Test 1: count_enrollments
+            if (studentNo) {
+                const count = await callCountEnrollments(studentNo);
+                results.push(`count_enrollments('${studentNo}') = ${count}`);
+            }
+            
+            // Test 2: has_completed_all_evaluations
+            if (studentNo) {
+                const status = await callHasCompletedAllEvaluations(studentNo);
+                results.push(`has_completed_all_evaluations('${studentNo}') = ${status}`);
+            }
+            
+            // Test 3: is_evaluated for current professor
+            if (currentProfessor && currentProfessor.enrollmentId) {
+                const isEval = await callIsEvaluated(currentProfessor.enrollmentId);
+                results.push(`is_evaluated(${currentProfessor.enrollmentId}) = ${isEval ? 'YES' : 'NO'}`);
+            }
+            
+            // Test 4: get_avg_rating for current professor
+            if (currentProfessor && currentProfessor.professorId) {
+                const avg = await callGetAvgRating(currentProfessor.professorId);
+                results.push(`get_avg_rating(${currentProfessor.professorId}) = ${avg || 'No ratings yet'}`);
+            }
+            
+            // Test 5: get_category_avg_rating for Teaching category
+            if (currentProfessor && currentProfessor.professorId) {
+                const teachingRating = await callGetCategoryAvgRating(currentProfessor.professorId, 'Teaching');
+                results.push(`get_category_avg_rating(${currentProfessor.professorId}, 'Teaching') = ${teachingRating || 'No ratings yet'}`);
+            }
+            
+            // Display results in a nice alert
+            alert("📊 DATABASE FUNCTION RESULTS:\n\n" + results.join("\n"));
+            
+            // Also log to console
+            console.log("FUNCTION TEST RESULTS:", results);
+        };
+        professorCard.appendChild(testBtn);
+    }
+}
+
+// ======================== SUBMIT EVALUATION ========================
+async function submitAndContinue() {
+    if (!isAllQuestionsComplete() || !isRemarksComplete()) {
+        showToast("Cannot submit! Please answer all questions first.");
+        return;
+    }
+
+    if (!currentProfessor || !currentProfessor.enrollmentId) {
+        console.error("Missing enrollmentId:", currentProfessor);
+        showToast("Enrollment ID missing. Cannot submit.");
+        return;
+    }
+
+    const responses = getCurrentAnswers().map((rating, index) => ({
+        questionId: index + 1,
+        rating
+    }));
+
+    const body = {
+        enrollmentId: currentProfessor.enrollmentId,
+        responses,
+        remarks: document.getElementById('remarksInput')?.value || ""
+    };
+
+    console.log("📤 SUBMITTING EVALUATION - This will call backend which uses Oracle functions");
+    console.log("SUBMIT PAYLOAD:", body);
+
+    try {
+        const res = await fetch('http://localhost:3000/api/evaluations/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-student-number': studentNo
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error("Backend error:", errorText);
+            showToast("Submission failed. Check console.");
+            return;
+        }
+
+        const data = await res.json();
+        console.log("✅ SUBMIT RESPONSE:", data);
+        
+        // After submission, call a function to verify
+        if (data.evaluationId) {
+            console.log("📞 Verifying submission by calling Oracle functions...");
+            const responseCount = await callCountResponses(data.evaluationId);
+            const remarksText = await callGetRemarks(data.evaluationId);
+            console.log(`✅ Verification: ${responseCount} responses submitted, Remarks: "${remarksText.substring(0, 30)}..."`);
+        }
+
+        professors[currentProfessorIndex].evaluated = true;
+        showToast(`Evaluation completed for ${currentProfessor.name}!`);
+
+        // Move to next professor
+        let nextIndex = professors.findIndex(p => !p.evaluated);
+
+        if (nextIndex !== -1) {
+            currentProfessorIndex = nextIndex;
+            currentProfessor = professors[currentProfessorIndex];
+            currentPage = 0;
+
+            document.getElementById('remarksInput').value = "";
+            document.getElementById('currentProfNameDisplay').innerText = currentProfessor.name;
+            document.getElementById('currentCourseDisplay').innerText = `Course Code: ${currentProfessor.course}`;
+            document.getElementById('currentEmailDisplay').innerText = currentProfessor.email || '';
+
+            updateProfessorAvatar(currentProfessor);
+
+            evaluationsStore[currentProfessor.name] = {
+                answers: new Array(questions.length).fill(null)
+            };
+
+            goToPage(0);
+            renderCurrentPageQuestions();
+            updateSubmitButtonState();
+            renderProfessorsList();
+
+        } else {
+            // All done - call completion function
+            const completionStatus = await callHasCompletedAllEvaluations(studentNo);
+            showToast(`All professors evaluated! Status: ${completionStatus}`);
+            setTimeout(() => {
+                window.location.href = "StudentDashboard.html?completed=true";
+            }, 1500);
+        }
+
+    } catch (error) {
+        console.error("Submit error:", error);
+        showToast("Network error. Try again.");
+    }
+}
+
+// ======================== HELPER FUNCTIONS ========================
 function getFallbackProfessors() {
     return [
-        { name: "Professor 1", course: "IM101", email: "prof1@qcu.edu", enrollmentId: 1, colorIndex: 0, evaluated: false },
-        { name: "Professor 2", course: "CS 202", email: "prof2@qcu.edu", enrollmentId: 2, colorIndex: 1, evaluated: false },
-        { name: "Professor 3", course: "IT 305", email: "prof3@qcu.edu", enrollmentId: 3, colorIndex: 2, evaluated: false },
-        { name: "Professor 4", course: "DS 401", email: "prof4@qcu.edu", enrollmentId: 4, colorIndex: 3, evaluated: false },
-        { name: "Professor 5", course: "AI 501", email: "prof5@qcu.edu", enrollmentId: 5, colorIndex: 4, evaluated: false }
+        { name: "Professor 1", course: "IM101", email: "prof1@qcu.edu", enrollmentId: 1, professorId: 1, colorIndex: 0, evaluated: false },
+        { name: "Professor 2", course: "CS202", email: "prof2@qcu.edu", enrollmentId: 2, professorId: 2, colorIndex: 1, evaluated: false },
+        { name: "Professor 3", course: "IT305", email: "prof3@qcu.edu", enrollmentId: 3, professorId: 3, colorIndex: 2, evaluated: false },
+        { name: "Professor 4", course: "DS401", email: "prof4@qcu.edu", enrollmentId: 4, professorId: 4, colorIndex: 3, evaluated: false },
+        { name: "Professor 5", course: "AI501", email: "prof5@qcu.edu", enrollmentId: 5, professorId: 5, colorIndex: 4, evaluated: false }
     ];
 }
 
@@ -139,6 +608,9 @@ function getStaticQuestions() {
         "The professor sets a good example through professional posture and poise."
     ];
 }
+
+// [REST OF YOUR EXISTING FUNCTIONS - getCurrentAnswers, setAnswer, isPageComplete, etc.]
+// Keep all your existing helper functions here...
 
 function getCurrentAnswers() {
     if (!currentProfessor) return [];
@@ -347,93 +819,6 @@ function goToPage(pageNum) {
     document.getElementById('mainContentArea').scrollTop = 0;
 }
 
-async function submitAndContinue() {
-    if (!isAllQuestionsComplete() || !isRemarksComplete()) {
-        showToast("Cannot submit! Please answer all questions first.");
-        return;
-    }
-
-    if (!currentProfessor || !currentProfessor.enrollmentId) {
-        console.error("Missing enrollmentId:", currentProfessor);
-        showToast("Enrollment ID missing. Cannot submit.");
-        return;
-    }
-
-    const responses = getCurrentAnswers().map((rating, index) => ({
-        questionId: index + 1,
-        rating
-    }));
-
-    const body = {
-        enrollmentId: currentProfessor.enrollmentId,
-        responses,
-        remarks: document.getElementById('remarksInput')?.value || ""
-    };
-
-    console.log("SUBMIT PAYLOAD:", body);
-
-    try {
-        const res = await fetch('http://localhost:3000/api/evaluations/submit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-student-number': studentNo
-            },
-            body: JSON.stringify(body)
-        });
-
-        if (!res.ok) {
-            const errorText = await res.text();
-            console.error("Backend error:", errorText);
-            showToast("Submission failed. Check console.");
-            return;
-        }
-
-        const data = await res.json();
-        console.log("SUBMIT RESPONSE:", data);
-
-        professors[currentProfessorIndex].evaluated = true;
-
-        showToast(`Evaluation completed for ${currentProfessor.name}!`);
-
-        // Move to next professor
-        let nextIndex = professors.findIndex(p => !p.evaluated);
-
-        if (nextIndex !== -1) {
-            currentProfessorIndex = nextIndex;
-            currentProfessor = professors[currentProfessorIndex];
-            currentPage = 0;
-
-            document.getElementById('remarksInput').value = "";
-
-            document.getElementById('currentProfNameDisplay').innerText = currentProfessor.name;
-            document.getElementById('currentCourseDisplay').innerText = `Course Code: ${currentProfessor.course}`;
-            document.getElementById('currentEmailDisplay').innerText = currentProfessor.email || '';
-
-            updateProfessorAvatar(currentProfessor);
-
-            evaluationsStore[currentProfessor.name] = {
-                answers: new Array(questions.length).fill(null)
-            };
-
-            goToPage(0);
-            renderCurrentPageQuestions();
-            updateSubmitButtonState();
-            renderProfessorsList();
-
-        } else {
-            showToast("All professors evaluated. Thank you!");
-            setTimeout(() => {
-                window.location.href = "StudentDashboard.html?completed=true";
-            }, 1500);
-        }
-
-    } catch (error) {
-        console.error("Submit error:", error);
-        showToast("Network error. Try again.");
-    }
-}
-
 function getInitials(name) {
     if (!name) return "??";
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -480,6 +865,13 @@ function switchProfessor(prof, index) {
     updatePageWarnings();
     renderProfessorsList();
     showToast(`Switched to ${prof.name}`);
+    
+    // Call function to show professor stats when switching
+    if (prof.professorId) {
+        callGetAvgRating(prof.professorId).then(avg => {
+            console.log(`📊 ${prof.name} average rating: ${avg}`);
+        });
+    }
 }
 
 function renderProfessorsList() {
