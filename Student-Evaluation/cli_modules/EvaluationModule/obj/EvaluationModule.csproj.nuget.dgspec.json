@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\SeanEthan\\Desktop\\For PL Ver2\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj": {}
+    "C:\\Users\\SeanEthan\\Desktop\\VErsion4\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj": {}
   },
   "projects": {
-    "C:\\Users\\SeanEthan\\Desktop\\For PL Ver2\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj": {
+    "C:\\Users\\SeanEthan\\Desktop\\VErsion4\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\SeanEthan\\Desktop\\For PL Ver2\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj",
+        "projectUniqueName": "C:\\Users\\SeanEthan\\Desktop\\VErsion4\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj",
         "projectName": "EvaluationModule",
-        "projectPath": "C:\\Users\\SeanEthan\\Desktop\\For PL Ver2\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj",
+        "projectPath": "C:\\Users\\SeanEthan\\Desktop\\VErsion4\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\EvaluationModule.csproj",
         "packagesPath": "C:\\Users\\SeanEthan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\SeanEthan\\Desktop\\For PL Ver2\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\obj\\",
+        "outputPath": "C:\\Users\\SeanEthan\\Desktop\\VErsion4\\Student-Eval-ver.1\\Student-Evaluation\\cli_modules\\EvaluationModule\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
