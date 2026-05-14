@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quezon City University - Home</title>
+    <link href="../styles/output.css" rel="stylesheet">
+</head>
+<body class="bg-white text-gray-900 font-sans min-h-screen overflow-y-auto overflow-x-hidden">
+
+    <header class="bg-[#4f46e5] text-white p-4 shadow-md fixed top-0 w-full z-50">
+        <div class="container mx-auto flex items-center justify-between px-4">
+            <h1 class="font-bold text-lg md:text-xl tracking-tight uppercase">
+                QUEZON CITY UNIVERSITY
+            </h1>
+            <button id="logInBtn" class="bg-[#2e2b8b] hover:bg-[#1e1c5f] text-white font-semibold py-1.5 px-5 rounded text-sm transition-all duration-300">
+                LOG IN
+            </button>
+        </div>
+    </header>
+
+    <main class="relative mt-15">
+        <section class="relative w-full h-[50vh] md:h-[65vh] overflow-hidden">
+            <img src="../images/qcu.png" alt="QCU Building" 
+                 class="absolute inset-0 w-full h-full object-cover">
+            
+            <div class="absolute inset-0 bg-black/40"></div>
+        </section>
+
+        <section class="relative z-20 -mt-24 md:-mt-32 container mx-auto px-4 pb-20">
+            <div class="bg-[#d1d5db] rounded-2xl p-6 md:p-10 shadow-2xl border border-gray-400">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-0">
+                    
+                    <div class="flex flex-col items-center px-4">
+                        <div class="w-32 h-32 md:w-44 md:h-44 mb-2 transition-transform hover:scale-105">
+                            <a href="https://legacy.ched.gov.ph/" target="_blank" rel="noopener noreferrer">
+                            <img src="../images/ched.png" alt="Logo 1" class="w-full h-full object-contain drop-shadow-xl">
+                            </a>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="font-bold text-gray-800 mb-2 underline decoration-indigo-500 underline-offset-4">CHED Accredited</h3>
+                            <p class="text-gray-900 text-sm text-justify leading-relaxed mt-4">
+                                Quezon City University is a full-fledged Higher Education Institution (HEI) formally recognized by the Commission on Higher Education (CHED), a milestone achieved in June 2021. This institutional recognition allows students to benefit from the Universal Access to Quality Tertiary Education Act, providing free tuition and access to various CHED-funded scholarships and financial assistance programs.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center px-4 md:border-x border-gray-500">
+                        <div class="w-32 h-32 md:w-44 md:h-44 mb-2 transition-transform hover:scale-105">
+                        <a href="https://qcu.edu.ph/" target="_blank" rel="noopener noreferrer">
+                            <img src="../images/qculogo.png" alt="Logo 2" class="w-full h-full object-contain drop-shadow-xl">
+                            </a>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="font-bold text-gray-800 mb-2 underline decoration-indigo-500 underline-offset-4">University Excellence</h3>
+                            <p class="text-gray-900 text-sm text-justify leading-relaxed mt-4">
+                                Established in 1994, Quezon City University (QCU) has evolved from a technical training center into a premier local institution recognized for its strong industry alliances and fiscal autonomy. Driven by the vision to be the top producer of employable graduates, the university offers diverse degree programs in engineering, IT, and business designed to meet both domestic and global market demands.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center px-4">
+                        <div class="w-32 h-32 md:w-44 md:h-44 mb-2 transition-transform hover:scale-105">
+                            <a href="https://qcu.edu.ph/academics/colleges-and-courses-offered/college-of-information-technology/" target="_blank" rel="noopener noreferrer">
+                            <img src="../images/bscs.png" alt="Logo 3" class="w-full h-full object-contain drop-shadow-xl">
+                            </a>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="font-bold text-gray-800 mb-2 underline decoration-indigo-500 underline-offset-4">Computer Science</h3>
+                            <p class="text-gray-900 text-sm text-justify leading-relaxed mt-4">
+                                The Bachelor of Science in Computer Science at Quezon City University provides a rigorous academic foundation in algorithmic complexity, software engineering, and computational systems. This program is strategically designed to cultivate technical expertise and innovative problem-solving skills, ensuring that graduates meet the sophisticated demands of the global information technology sector.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../scripts/SP.js"></script>
+</body>
+</html>

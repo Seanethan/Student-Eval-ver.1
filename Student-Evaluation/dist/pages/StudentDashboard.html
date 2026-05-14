@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>QCU Instructions</title>
+    <link href="../styles/EvalPage.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-300 font-sans h-screen flex flex-col overflow-hidden">
+
+    <div class="bg-[#4f46e5] text-white flex justify-between items-center px-8 py-4 shadow-lg shrink-0">
+        <h1 class="text-xl font-bold uppercase">Quezon City University</h1>
+        <button id="logoutBtn" class="bg-red-500 px-5 py-2 rounded-xl shadow hover:bg-red-600">
+            Log Out
+        </button>
+    </div>
+
+    <div class="page-wrapper flex-1 overflow-hidden p-6">
+        <div class="grid grid-cols-1 md:grid-cols-[340px_1fr] gap-6 h-full">
+            
+            <div class="flex flex-col gap-5 h-full overflow-hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-5 shrink-0">
+                    <p class="text-sm text-gray-500 font-semibold mb-1">Student Number:</p>
+                    <p id="studentDisplay" class="text-2xl font-bold text-gray-800 mb-3">24 - XXXX</p>
+                    <p class="text-gray-700 text-sm mb-1"><span class="font-medium">Class Code:</span> 24 - XXXX</p>
+                    <p class="text-gray-700 text-sm mb-1"><span class="font-medium">Number of Professor:</span> 5</p>
+                    <p class="text-green-600 font-semibold text-sm mt-2">Status: Regular</p>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-indigo-500 currently-evaluating-card shrink-0">
+                    <div id="currentProfAvatar" class="prof-avatar-large bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg mb-4 text-white flex items-center justify-center font-bold">N/A</div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1"><b>Currently Evaluating</b></p>
+                        <p class="font-bold text-2xl text-gray-800" id="currentProfNameDisplay">None</p>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-3" id="currentCourseDisplay"><b>Course Code: None</b></p>
+                    <p class="text-xs text-indigo-600 mt-1 break-all" id="currentEmailDisplay">None</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg p-4 flex-1 flex flex-col overflow-hidden">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">List of Professors</p>
+                    <div class="flex-1 overflow-y-auto custom-scroll" id="professorsListContainer">
+                        </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden h-full">
+                <div class="bg-[#4f46e5] text-white px-8 py-5 shrink-0">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold"><b>Instructions</b></h2>
+                        <div id="dateTimeDisplayHeader" class="text-sm bg-indigo-700 px-4 py-1.5 rounded-full font-medium">--/--/---- --:-- --</div>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto custom-scroll p-8" id="mainContentArea">
+                    <div id="page0" class="page-content page-transition">
+                        <p class="text-gray-500 font-medium mb-8">Please read and follow the instructions carefully to ensure your evaluation is recorded successfully</p>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-6">
+                                <div class="bg-[#4f46e5] text-white w-16 h-12 flex items-center justify-center rounded-l-full shrink-0 text-xl font-bold">1</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Read Carefully</h4>
+                                    <p class="text-sm text-gray-500">Please read each question carefully before answering to provide an accurate assessment.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-6">
+                                <div class="bg-[#4f46e5] text-white w-16 h-12 flex items-center justify-center rounded-l-full shrink-0 text-xl font-bold">2</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Rating Scale</h4>
+                                    <p class="text-sm text-gray-500">Select the rating that best reflects your evaluation (1 = Poor, 5 = Excellent).</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-6">
+                                <div class="bg-[#4f46e5] text-white w-16 h-12 flex items-center justify-center rounded-l-full shrink-0 text-xl font-bold">3</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Completion</h4>
+                                    <p class="text-sm text-gray-500">All questions must be answered before submitting. Note the indicators: Green = Done, Red = Pending.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-6">
+                                <div class="bg-[#4f46e5] text-white w-16 h-12 flex items-center justify-center rounded-l-full shrink-0 text-xl font-bold">4</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Submission</h4>
+                                    <p class="text-sm text-gray-500">After completing all questions, click Submit to continue to the next professor automatically.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-10 flex justify-end">
+                            <button id="startBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl shadow transition font-semibold">
+                                Start
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../scripts/SD.js"></script>
+</body>
+</html>

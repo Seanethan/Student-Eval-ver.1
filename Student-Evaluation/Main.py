@@ -1,4 +1,3 @@
-
 import configparser
 import json
 import os
@@ -9,25 +8,58 @@ import time
 import oracledb
 from getpass import getpass
 
-# ─────────────────────────────────────────────
-#  Config
-# ─────────────────────────────────────────────
-BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
-CONFIG_FILE = os.path.join(BASE_DIR, "sql_queries.ini")
-PAGES_DIR   = os.path.join(BASE_DIR, "pages")
+# =============================================
+# Fix for PyInstaller - Get correct paths
+# =============================================
+def get_base_path():
+    """Get the correct base path whether running as script or exe"""
+    if getattr(sys, 'frozen', False):
+        # Running as compiled exe
+        return os.path.dirname(sys.executable)
+    else:
+        # Running as script
+        return os.path.dirname(os.path.abspath(__file__))
+
+def get_resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller"""
+    base_path = get_base_path()
+    return os.path.join(base_path, relative_path)
+
+# =============================================
+# Force thick mode to avoid cryptography issues
+# =============================================
+try:
+    # Try to use thick mode (requires Oracle Instant Client)
+    oracledb.init_oracle_client()
+    print("Using Oracle Thick Mode")
+except:
+    # Fall back to thin mode
+    print("Using Oracle Thin Mode")
+    pass
+
+# =============================================
+# Config - Use resource paths
+# =============================================
+BASE_DIR = get_base_path()
+CONFIG_FILE = get_resource_path("sql_queries.ini")
+PAGES_DIR = get_resource_path("pages")
+
+# Debug - remove after testing
+print(f"Base Dir: {BASE_DIR}")
+print(f"Config exists: {os.path.exists(CONFIG_FILE)}")
 
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE)
 
 # Paths to compiled submodule executables
-EVAL_EXE = os.path.join(BASE_DIR, "cli_modules", "EvaluationModule",
-                        "bin", "Release", "net8.0", "win-x64", "publish", "EvaluationModule.exe")
-REG_JAR  = os.path.join(BASE_DIR, "cli_modules", "RegisterModule",
-                        "target", "RegisterModule.jar")
+EVAL_EXE = get_resource_path(os.path.join("cli_modules", "EvaluationModule",
+                        "bin", "Release", "net8.0", "win-x64", "publish", "EvaluationModule.exe"))
+REG_JAR = get_resource_path(os.path.join("cli_modules", "RegisterModule",
+                        "target", "RegisterModule.jar"))
 
-# ─────────────────────────────────────────────
-#  DB helpers
-# ─────────────────────────────────────────────
+# =============================================
+# DB helpers
+# =============================================
 def get_connection():
     return oracledb.connect(
         user=config["DATABASE"]["user"],
@@ -46,9 +78,9 @@ def run_query(sql: str, params: dict = None, fetch: bool = True):
             conn.commit()
             return cur.rowcount
 
-# ─────────────────────────────────────────────
-#  UI helpers
-# ─────────────────────────────────────────────
+# =============================================
+# UI helpers
+# =============================================
 LINE = "─" * 60
 THIN = "·" * 60
 
@@ -64,9 +96,9 @@ def section(title: str):
 def pause():
     input("\n  Press ENTER to continue...")
 
-# ─────────────────────────────────────────────
-#  Browser launcher
-# ─────────────────────────────────────────────
+# =============================================
+# Browser launcher
+# =============================================
 def _inject_and_open(student_id: str, student_info: dict):
     info_json = json.dumps(student_info)
     html = f"""<!DOCTYPE html>
@@ -94,10 +126,9 @@ def _inject_and_open(student_id: str, student_info: dict):
         file_url = "file:///" + redirect_path.replace("\\", "/")
         webbrowser.open(file_url)
 
-# ═══════════════════════════════════════════════════════════════
-#  STUDENT LOGIN  (Python)
-#  DB: student_id, course_code, year_level, section
-# ═══════════════════════════════════════════════════════════════
+# =============================================
+# STUDENT LOGIN
+# =============================================
 def student_login():
     banner()
     section("STUDENT LOG-IN")
@@ -117,7 +148,6 @@ def student_login():
         return
 
     student = rows[0]
-    # Aligned to actual DB columns
     student_info = {
         "studentId":  str(student.get("STUDENT_ID",  "")),
         "courseCode": str(student.get("COURSE_CODE", "")),
@@ -137,9 +167,9 @@ def student_login():
     print(f"\n  ✔  Browser opened.")
     pause()
 
-# ═══════════════════════════════════════════════════════════════
-#  ADMIN LOGIN  (Python — launches C# and Java submodules)
-# ═══════════════════════════════════════════════════════════════
+# =============================================
+# ADMIN LOGIN
+# =============================================
 def admin_login():
     banner()
     section("ADMIN LOG-IN")
@@ -183,7 +213,7 @@ def launch_evaluation_module():
         print(f"     dotnet publish -c Release -r win-x64 --self-contained false")
         pause()
         return
-    ini_path = os.path.join(BASE_DIR, "sql_queries.ini")
+    ini_path = CONFIG_FILE
     print("\n  Launching Evaluation Module (C#)...\n")
     subprocess.run([EVAL_EXE, ini_path], cwd=BASE_DIR)
 
@@ -194,13 +224,13 @@ def launch_register_module():
         print(f"     mvn package")
         pause()
         return
-    ini_path = os.path.join(BASE_DIR, "sql_queries.ini")
+    ini_path = CONFIG_FILE
     print("\n  Launching Register Module (Java)...\n")
     subprocess.run(["java", "-jar", REG_JAR, ini_path], cwd=BASE_DIR)
 
-# ═══════════════════════════════════════════════════════════════
-#  MAIN MENU
-# ═══════════════════════════════════════════════════════════════
+# =============================================
+# MAIN MENU
+# =============================================
 def main():
     while True:
         banner()

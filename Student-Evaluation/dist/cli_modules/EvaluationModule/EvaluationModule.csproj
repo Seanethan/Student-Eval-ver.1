@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>EvaluationModule</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Oracle ODP.NET managed driver -->
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.5.1" />
+    <!-- INI file parser -->
+    <PackageReference Include="ini-parser-netstandard" Version="2.5.2" />
+  </ItemGroup>
+</Project>

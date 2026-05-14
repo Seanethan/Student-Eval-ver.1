@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCU - Login Selection</title>
+    <link href="../styles/output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-300 flex items-center justify-center min-h-screen font-sans">
+
+    <div class="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md text-center mx-4 transition-all animate-in fade-in zoom-in duration-300">
+        
+        <h1 class="text-4xl font-bold text-[#4f46e5] mb-8 tracking-tight">
+            WELCOME
+        </h1>
+
+        <div class="flex justify-center mb-8">
+            <div class="w-48 h-48 rounded-full bg-[#fdf2e9] overflow-hidden flex items-center justify-center">
+                <img 
+                    src="../images/avatar.png" 
+                    alt="User Avatar icon" 
+                    class="w-full h-full object-cover"
+                />
+            </div>
+        </div>
+
+        <p class="text-gray-600 text-lg font-medium mb-8">
+            You’re logging in as
+        </p>
+
+        <div class="flex flex-col gap-5">
+            
+            <button onclick="location.href='StudentLogin.html'" 
+                class="bg-[#4f46e5] hover:bg-[#3f38c2] text-white text-xl font-bold py-4 rounded-2xl shadow-lg transform active:scale-95 transition-all">
+                Student
+            </button>
+
+            <button onclick="location.href='admin-dash.html'" 
+                class="bg-[#d1d5db] hover:bg-gray-300 text-[#6b7280] text-xl font-bold py-4 rounded-2xl transform active:scale-95 transition-all">
+                Admin
+            </button>
+            
+        </div>
+
+        <button onclick="window.location.href='StartingPage.html'" 
+            class="mt-8 text-sm text-gray-400 hover:text-indigo-600 transition-colors">
+            ← Go Back to Home
+        </button>
+    </div>
+
+</body>
+</html>
