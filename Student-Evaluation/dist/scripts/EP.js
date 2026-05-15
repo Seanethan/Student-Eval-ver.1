@@ -235,53 +235,7 @@ async function demonstrateFunctionCalls() {
     console.log("🔍 DEMONSTRATING ORACLE DATABASE FUNCTIONS");
     console.log("=========================================");
     
-    // Demo 1: Count enrollments for current student
-    if (studentNo) {
-        const enrollmentCount = await callCountEnrollments(studentNo);
-        console.log(`📊 Student ${studentNo} has ${enrollmentCount} enrollment(s)`);
-        
-        // Update UI to show function result
-        const enrollmentInfo = document.querySelector('.bg-white.rounded-2xl.shadow-lg.p-5');
-        if (enrollmentInfo && !document.getElementById('functionDemoBadge')) {
-            const demoBadge = document.createElement('div');
-            demoBadge.id = 'functionDemoBadge';
-            demoBadge.className = 'mt-3 text-xs text-indigo-600 bg-indigo-50 p-2 rounded-lg';
-            demoBadge.innerHTML = `
-                <strong>📊 Database Function Demo:</strong><br>
-                count_enrollments('${studentNo}') = ${enrollmentCount}
-            `;
-            enrollmentInfo.appendChild(demoBadge);
-        }
-    }
     
-    // Demo 2: Check completion status
-    if (studentNo) {
-        const completionStatus = await callHasCompletedAllEvaluations(studentNo);
-        console.log(`📊 Completion status: ${completionStatus}`);
-    }
-    
-    // Demo 3: If we have a current professor, show their stats
-    if (currentProfessor && currentProfessor.classId) {
-        const professorId = currentProfessor.classId; // Adjust based on your data structure
-        const avgRating = await callGetAvgRating(professorId);
-        const totalEvals = await callGetTotalEvaluations(professorId);
-        
-        console.log(`📊 Professor stats - Avg Rating: ${avgRating}, Total Evals: ${totalEvals}`);
-        
-        // Add function result to professor info card
-        const profInfoCard = document.querySelector('.bg-white.rounded-2xl.shadow-lg.p-6.border-l-4');
-        if (profInfoCard && !document.getElementById('profFunctionStats')) {
-            const statsDiv = document.createElement('div');
-            statsDiv.id = 'profFunctionStats';
-            statsDiv.className = 'mt-4 pt-3 border-t border-gray-200 text-xs';
-            statsDiv.innerHTML = `
-                <p class="text-gray-600"><strong>📊 Database Function Results:</strong></p>
-                <p>get_avg_rating(${professorId}) = ${avgRating || 'N/A'}</p>
-                <p>get_total_evaluations(${professorId}) = ${totalEvals || 'N/A'}</p>
-            `;
-            profInfoCard.appendChild(statsDiv);
-        }
-    }
     
     console.log("=========================================");
     console.log("✅ Function demonstration complete");

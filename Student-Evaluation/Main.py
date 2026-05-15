@@ -190,7 +190,7 @@ def admin_menu():
     while True:
         banner()
         section("ADMIN MENU")
-        print("  [1] Evaluation for Teachers  (C#)")
+        print("  [1] Evaluation for Teachers   #)")
         print("  [2] Register Students        (Java)")
         print("  [0] Logout")
         print()

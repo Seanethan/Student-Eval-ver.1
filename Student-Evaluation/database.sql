@@ -350,28 +350,7 @@ END;
 
 DROP TRIGGER trg_update_evaluation_status;
 
--- TRIGGER 7: NEW - Prevent evaluation after submission deadline (assuming 30 days after enrollment)
-CREATE OR REPLACE TRIGGER trg_check_submission_deadline
-BEFORE INSERT ON Responses
-FOR EACH ROW
-DECLARE
-    v_enrollment_date TIMESTAMP;
-    v_deadline TIMESTAMP;
-BEGIN
-    -- Get enrollment date
-    SELECT e.enrollment_date INTO v_enrollment_date
-    FROM Evaluations ev
-    JOIN Enrollments e ON ev.enrollment_id = e.enrollment_id
-    WHERE ev.evaluation_id = :NEW.evaluation_id;
-    
-    -- Set deadline to 30 days after enrollment
-    v_deadline := v_enrollment_date + 30;
-    
-    IF SYSTIMESTAMP > v_deadline THEN
-        RAISE_APPLICATION_ERROR(-20008, 'Submission deadline has passed (30 days from enrollment).');
-    END IF;
-END;
-/
+
 
 -- TRIGGER 8: NEW - Log all rating changes for audit purposes
 CREATE OR REPLACE TRIGGER trg_audit_rating_changes
